@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Material Purchases</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+            color: #8b4545;
+        }
+
+        h1 {
+            color: #000000;
+            border-bottom: 3px solid #ac0606;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: #000000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #8b4545;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f0f3f7;
+        }
+
+        form {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin-top: 15px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 20px;
+            background-color: #ac0606;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #83060f;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+<h1>Material Purchases</h1>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Material Type</th>
+        <th>Quantity</th>
+        <th>Unit</th>
+        <th>Status</th>
+        <th>Handled By</th>
+    </tr>
+
+    <tr th:each="p : ${purchases}">
+        <td th:text="${p.purchaseId}"></td>
+
+        <td th:text="${materialTypeMap[p.materialTypeId]?.materialName}">
+        </td>
+
+        <td th:text="${p.quantity}"></td>
+
+        <td th:text="${materialTypeMap[p.materialTypeId]?.unit}">
+        </td>
+
+        <td th:text="${p.status}"></td>
+
+        <td th:text="${p.handledBy}"></td>
+    </tr>
+</table>
+
+<h2>New Purchase</h2>
+
+<form th:action="@{/material-purchases}"
+      th:object="${newPurchase}"
+      method="post">
+
+    <label>Material Type</label>
+
+    <select th:field="*{materialTypeId}"
+            id="materialTypeSelect"
+            onchange="updateUnit()">
+
+        <option th:each="mt : ${materialTypes}"
+                th:value="${mt.materialTypeId}"
+                th:text="${mt.materialName}"
+                th:attr="data-unit=${mt.unit}">
+        </option>
+
+    </select>
+
+    <label>
+        Quantity <span id="unitLabel"></span>
+    </label>
+
+    <input type="number"
+           th:field="*{quantity}"
+           min="1">
+
+    <label>Handled By</label>
+
+    <select th:field="*{handledBy}">
+
+        <option th:each="s : ${staffList}"
+                th:value="${s.staffId}"
+                th:text="${s.firstName + ' ' + s.lastName}">
+        </option>
+
+    </select>
+
+    <button type="submit">
+        Add Purchase
+    </button>
+
+</form>
+
+<script>
+    function updateUnit() {
+        var select = document.getElementById("materialTypeSelect");
+        var selectedOption = select.options[select.selectedIndex];
+
+        var unit = selectedOption.getAttribute("data-unit");
+
+        document.getElementById("unitLabel").innerText =
+            unit ? "(" + unit + ")" : "";
+    }
+
+    window.onload = updateUnit;
+</script>
+
+</body>
+</html>
