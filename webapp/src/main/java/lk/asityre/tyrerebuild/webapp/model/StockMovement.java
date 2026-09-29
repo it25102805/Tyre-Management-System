@@ -1,10 +1,12 @@
 package lk.asityre.tyrerebuild.webapp.model;
+
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 @Table (name = "stockMovement")
 public class StockMovement {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "movement_id")
@@ -12,6 +14,9 @@ public class StockMovement {
 
     @Column(name = "material_type_id", nullable = false)
     private Integer materialTypeId;
+
+    @Column(name = "order_id")
+    private Integer orderId;
 
     @Column(name = "movement_type" , nullable = false)
     private String movementType;
@@ -39,6 +44,14 @@ public class StockMovement {
 
     public void setMaterialTypeId(Integer materialTypeId) {
         this.materialTypeId = materialTypeId;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
     }
 
     public String getMovementType() {

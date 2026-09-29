@@ -35,6 +35,7 @@ public class StockMovementService {
             existingMovement.setMovementType(updatedMovement.getMovementType());
             existingMovement.setQuantity(updatedMovement.getQuantity());
             existingMovement.setHandledBy(updatedMovement.getHandledBy());
+            existingMovement.setOrderId(updatedMovement.getOrderId()); // Added orderId update
             return stockMovementRepository.save(existingMovement);
         }
         return null;

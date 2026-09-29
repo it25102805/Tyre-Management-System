@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Orders</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+            color: #2c3e50;
+        }
+
+        h1 {
+            color: #000000;
+            border-bottom: 3px solid #ac0606;
+            padding-bottom: 10px;
+        }
+
+        .layout {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            align-items: flex-start;
+        }
+
+        .table-section {
+            flex: 2;
+        }
+
+        .form-section {
+            flex: 1;
+            position: sticky;
+            top: 20px;
+        }
+
+        #searchBox {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #8b4545;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f0f3f7;
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-PENDING     { background: #fef3c7; color: #92400e; }
+        .badge-APPROVED    { background: #dbeafe; color: #1e40af; }
+        .badge-IN_PROGRESS { background: #e0e7ff; color: #3730a3; }
+        .badge-COMPLETED   { background: #d1fae5; color: #065f46; }
+        .badge-CANCELLED   { background: #fee2e2; color: #991b1b; }
+
+        /* Action buttons */
+        .icon-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            margin: 0 3px;
+            width: auto;
+        }
+
+        .edit-btn:hover,
+        .delete-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* Delete form inside table */
+        .delete-form {
+            display: inline;
+            background: none;
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+        }
+
+        /* Main form */
+        .order-form {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .error-message {
+            color: #ac0606;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        button[type="submit"] {
+            margin-top: 20px;
+            background-color: #ac0606;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #83060f;
+        }
+
+        /* Make delete button ignore submit-button styling */
+        .delete-form button[type="submit"] {
+            margin-top: 0;
+            background-color: transparent;
+            color: inherit;
+            padding: 5px;
+            width: auto;
+        }
+
+        .delete-form button[type="submit"]:hover {
+            background-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Orders</h1>
+
+<div class="layout">
+
+    <!-- TABLE -->
+    <div class="table-section">
+
+        <input type="text"
+               id="searchBox"
+               placeholder="Search by customer, tire, or status..."
+               onkeyup="filterTable()">
+
+        <table id="orderTable">
+
+            <tr>
+                <th>ID</th>
+                <th>Customer ID</th>
+                <th>Tire ID</th>
+                <th>Order Date</th>
+                <th>Required Date</th>
+                <th>Qty</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+
+            <tr th:each="order : ${orders}">
+
+                <td th:text="${order.orderId}"></td>
+
+                <td th:text="${order.customerId}"></td>
+
+                <td th:text="${order.tireId}"></td>
+
+                <td th:text="${order.orderDate}"></td>
+
+                <td th:text="${order.requiredDate}"></td>
+
+                <td th:text="${order.quantity}"></td>
+
+                <td>
+                    <span class="badge"
+                          th:classappend="'badge-' + ${order.orderStatus}"
+                          th:text="${order.orderStatus}"></span>
+                </td>
+
+                <td>
+
+                    <!-- EDIT BUTTON -->
+                    <button type="button"
+                            class="icon-btn edit-btn"
+                            title="Edit"
+                            th:attr="onclick='editRow(' + ${order.orderId} + ',' + ${order.customerId} + ',' + ${order.tireId} + ',&quot;' + ${order.orderDate} + '&quot;,&quot;' + ${order.requiredDate} + '&quot;,' + ${order.quantity} + ',&quot;' + ${order.orderStatus} + '&quot;)'">
+                        🖊️
+                    </button>
+
+                    <!-- DELETE BUTTON -->
+                    <form th:action="@{/orders/delete/{id}(id=${order.orderId})}"
+                          method="post"
+                          class="delete-form"
+                          onsubmit="return confirm('Are you sure you want to delete this order?');">
+
+                        <button type="submit"
+                                class="icon-btn delete-btn"
+                                title="Delete">
+                            🗑
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+
+    <!-- ADD / EDIT FORM -->
+    <div class="form-section">
+
+        <h2 id="formTitle">Add Order</h2>
+
+        <form th:action="@{/orders}"
+              th:object="${newOrder}"
+              method="post"
+              class="order-form"
+              onsubmit="return validateOrder()">
+
+            <input type="hidden"
+                   id="orderId"
+                   th:field="*{orderId}"/>
+
+            <label>Customer ID</label>
+            <input type="number"
+                   id="customerId"
+                   th:field="*{customerId}"
+                   min="1"
+                   required/>
+
+            <label>Tire ID</label>
+            <input type="number"
+                   id="tireId"
+                   th:field="*{tyreId}"
+                   min="1"
+                   required/>
+
+            <label>Order Date</label>
+            <input type="date"
+                   id="orderDate"
+                   th:field="*{orderDate}"
+                   required/>
+
+            <label>Required Date</label>
+            <input type="date"
+                   id="requiredDate"
+                   th:field="*{requiredDate}"/>
+
+            <label>Quantity</label>
+            <input type="number"
+                   id="quantity"
+                   th:field="*{quantity}"
+                   min="1"
+                   value="1"
+                   required/>
+
+            <div id="quantityError" class="error-message">
+                Quantity must be greater than zero.
+            </div>
+
+            <label>Status</label>
+            <select id="orderStatus" th:field="*{orderStatus}">
+                <option value="PENDING">PENDING</option>
+                <option value="APPROVED">APPROVED</option>
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="CANCELLED">CANCELLED</option>
+            </select>
+
+            <button type="submit" id="submitBtn">
+                Add Order
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // EDIT ORDER
+    function editRow(id, customerId, tireId, orderDate, requiredDate, quantity, status) {
+
+        document.getElementById("orderId").value = id;
+        document.getElementById("customerId").value = customerId;
+        document.getElementById("tireId").value = tireId;
+        document.getElementById("orderDate").value = orderDate;
+        document.getElementById("requiredDate").value = requiredDate;
+        document.getElementById("quantity").value = quantity;
+        document.getElementById("orderStatus").value = status;
+
+        document.getElementById("formTitle").innerText = "Edit Order";
+        document.getElementById("submitBtn").innerText = "Update Order";
+
+        clearError();
+    }
+
+
+    // FORM VALIDATION
+    function validateOrder() {
+
+        var quantity = parseInt(document.getElementById("quantity").value);
+
+        if (isNaN(quantity) || quantity <= 0) {
+            document.getElementById("quantityError").style.display = "block";
+            return false;
+        }
+
+        return true;
+    }
+
+
+    // CLEAR ERROR MESSAGE
+    function clearError() {
+        document.getElementById("quantityError").style.display = "none";
+    }
+
+
+    // SEARCH ORDERS
+    function filterTable() {
+
+        var input = document.getElementById("searchBox").value.toUpperCase();
+        var rows = document.getElementById("orderTable").getElementsByTagName("tr");
+
+        for (var i = 1; i < rows.length; i++) {
+
+            var cells = rows[i].getElementsByTagName("td");
+
+            if (cells.length > 0) {
+
+                var customerId = cells[1].textContent.trim();
+                var tireId     = cells[2].textContent.trim();
+                var status     = cells[6].textContent.trim().toUpperCase();
+
+                var match =
+                    customerId.indexOf(input) > -1 ||
+                    tireId.indexOf(input) > -1     ||
+                    status.indexOf(input) > -1;
+
+                rows[i].style.display = match ? "" : "none";
+            }
+        }
+    }
+
+</script>
+
+</body>
+</html>

@@ -32,10 +32,8 @@ public class StaffService {
     public Staff updateStaff(Integer id, Staff updatedStaff) {
         Staff existingStaff = staffRepository.findById(id).orElse(null);
         if (existingStaff != null) {
-            existingStaff.setFirstName(updatedStaff.getFirstName());
-            existingStaff.setLastName(updatedStaff.getLastName());
             existingStaff.setRole(updatedStaff.getRole());
-            existingStaff.setContactNumber(updatedStaff.getContactNumber());
+            // Removed firstName, lastName, and contactNumber updates
             return staffRepository.save(existingStaff);
         }
         return null;
