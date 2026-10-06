@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 40px; color: #2c3e50; }
+        h1 { color: #000000; border-bottom: 3px solid #ac0606; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px 15px; text-align: center; }
+        th { background-color: #8b4545; color: white; }
+        tr:nth-child(even) { background-color: #f0f3f7; }
+        .save-btn { background-color: #3a6ea5; color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; }
+        .save-btn:hover { background-color: #2c557f; }
+        form { margin: 0; }
+    </style>
+</head>
+<body>
+
+<h1>Welcome, <span th:text="${name}"></span> (<span th:text="${role}"></span>)</h1>
+<p><a th:href="@{/logout}">Logout</a></p>
+
+<p th:if="${role == 'VISITOR'}">Your meeting is booked. After we meet, we will upgrade your account to customer.</p>
+
+<h2 th:text="${staff} ? 'All Appointments' : 'My Appointments'"></h2>
+
+<table>
+    <tr>
+        <th>ID</th><th>Name</th><th>Date</th><th>Time</th><th>Purpose</th><th>Status</th>
+        <th th:if="${staff}">Action</th>
+    </tr>
+    <tr th:each="a : ${appointments}">
+        <td th:text="${a.appointmentId}"></td>
+        <td th:text="${userMap[a.userId]?.name}"></td>
+        <td th:text="${a.appointmentDate}"></td>
+        <td th:text="${a.appointmentTime}"></td>
+        <td th:text="${a.purpose}"></td>
+        <td th:text="${a.status}"></td>
+        <td th:if="${staff}">
+            <form th:action="@{/status}" method="post">
+                <input type="hidden" name="id" th:value="${a.appointmentId}">
+                <select name="status">
+                    <option value="BOOKED">BOOKED</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="CANCELLED">CANCELLED</option>
+                </select>
+                <button type="submit" class="save-btn">Save</button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

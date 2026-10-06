@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Production Pipeline</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 40px; color: #2c3e50; }
+        h1 { color: #000000; border-bottom: 3px solid #ac0606; padding-bottom: 10px; }
+        h2 { margin-top: 40px; color: #000000; }
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-top: 15px; }
+        th, td { padding: 12px 15px; text-align: center; }
+        th { background-color: #8b4545; color: white; }
+        tr:nth-child(even) { background-color: #f0f3f7; }
+        select { padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #ac0606; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #83060f; }
+        .stage-badge { padding: 4px 10px; border-radius: 12px; color: white; font-size: 13px; }
+        .RECEIVED { background-color: #7f8c8d; }
+        .PREPARATION { background-color: #e67e22; }
+        .BUILDING { background-color: #2980b9; }
+        .CURING { background-color: #8e44ad; }
+        .COMPLETED { background-color: #27ae60; }
+        form.add-form {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin-top: 15px;
+        }
+        form.add-form label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        form.add-form input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        form.add-form button {
+            margin-top: 20px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Production Pipeline — Tyre Inventory</h1>
+
+<table>
+    <tr>
+        <th>Tyre Batch Number</th><th>Order Number</th><th>Brand</th><th>Size</th><th>Client</th>
+        <th>Received</th><th>Expected</th><th>Stage</th><th>Update</th>
+    </tr>
+    <tr th:each="t : ${tyres}">
+        <td th:text="${t.tyreNumber}"></td>
+        <td th:text="${t.orderId}"></td>
+        <td th:text="${t.brand}"></td>
+        <td th:text="${t.tyreSize}"></td>
+        <td th:text="${userMap[t.customerId] != null ? userMap[t.customerId].firstName + ' ' + userMap[t.customerId].lastName : 'Unknown'}"></td>
+        <td th:text="${t.receivedDate}"></td>
+        <td th:text="${t.expectedDate}"></td>
+        <td>
+            <span class="stage-badge" th:classappend="${t.rebuildStage}" th:text="${t.rebuildStage}"></span>
+        </td>
+        <td>
+            <form th:action="@{/production/update-stage}" method="post" style="display:flex; gap:6px; justify-content:center;">
+                <input type="hidden" name="tyreId" th:value="${t.tyreId}"/>
+                <select name="stage">
+                    <option value="RECEIVED" th:selected="${t.rebuildStage.name() == 'RECEIVED'}">Received</option>
+                    <option value="PREPARATION" th:selected="${t.rebuildStage.name() == 'PREPARATION'}">Preparation</option>
+                    <option value="BUILDING" th:selected="${t.rebuildStage.name() == 'BUILDING'}">Building</option>
+                    <option value="CURING" th:selected="${t.rebuildStage.name() == 'CURING'}">Curing</option>
+                    <option value="COMPLETED" th:selected="${t.rebuildStage.name() == 'COMPLETED'}">Completed</option>
+                </select>
+                <button type="submit">Update</button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+<h2>Add Tyre</h2>
+<form th:action="@{/production/add}" th:object="${newTyre}" method="post" class="add-form">
+    <label>Customer ID</label>
+    <input type="number" th:field="*{customerId}"/>
+
+    <label>Order ID (optional)</label>
+    <input type="number" th:field="*{orderId}"/>
+
+    <label>Tyre Number</label>
+    <input type="text" th:field="*{tyreNumber}"/>
+
+    <label>Brand</label>
+    <input type="text" th:field="*{brand}"/>
+
+    <label>Size</label>
+    <input type="text" th:field="*{tyreSize}"/>
+
+    <button type="submit">Add Tyre</button>
+</form>
+
+</body>
+</html>

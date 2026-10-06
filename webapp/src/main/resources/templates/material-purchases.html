@@ -1,390 +1,281 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Material Purchases</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 40px;
-            color: #2c3e50;
-        }
+    <title>Material Purchases | ASI Tyre</title>
 
-        h1 {
-            color: #000000;
-            border-bottom: 3px solid #ac0606;
-            padding-bottom: 10px;
-        }
-
-        .layout {
-            display: flex;
-            gap: 30px;
-            margin-top: 20px;
-            align-items: flex-start;
-        }
-
-        .table-section {
-            flex: 2;
-        }
-
-        .form-section {
-            flex: 1;
-            position: sticky;
-            top: 20px;
-        }
-
-        #searchBox {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #8b4545;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f0f3f7;
-        }
-
-        .edit-btn {
-            background-color: #3a6ea5;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .edit-btn:hover {
-            background-color: #2c557f;
-        }
-
-        form {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        }
-
-        label {
-            display: block;
-            margin-top: 12px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        button[type="submit"] {
-            margin-top: 20px;
-            background-color: #ac0606;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #83060f;
-        }
-
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 12px;
-            color: white;
-            font-size: 13px;
-        }
-
-        .Pending {
-            background-color: #e67e22;
-        }
-
-        .Ordered {
-            background-color: #2980b9;
-        }
-
-        .Received {
-            background-color: #27ae60;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/purchases.css}">
 </head>
 
 <body>
 
-<h1>Material Purchases</h1>
+<!-- SIDEBAR -->
+<aside th:replace="~{fragments/sidebar :: sidebar('purchases')}"></aside>
 
-<div class="layout">
 
-    <div class="table-section">
+<!-- MAIN CONTENT -->
+<main class="main">
 
-        <input
-                type="text"
-                id="searchBox"
-                placeholder="Search by material or status..."
-                onkeyup="filterTable()">
+    <!-- PAGE HEADER -->
+    <div class="topbar">
 
-        <table id="purchaseTable">
+        <div class="page-title">
+            <h1>Material Purchases</h1>
+            <p>Manage material orders and purchasing activities.</p>
+        </div>
 
+        <a href="#addPurchaseForm" class="add-btn">
+            + Add Purchase
+        </a>
+
+    </div>
+
+
+    <!-- SUMMARY CARDS -->
+    <section class="cards">
+
+        <!-- TOTAL -->
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Total Purchases</div>
+                <div class="card-icon">📦</div>
+            </div>
+            <div class="card-number"
+                 th:text="${#lists.size(purchases)}">
+                0
+            </div>
+        </div>
+
+        <!-- PENDING -->
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Pending</div>
+                <div class="card-icon">⏳</div>
+            </div>
+            <div class="card-number"
+                 th:text="${#lists.size(purchases.?[status == 'Pending'])}">
+                0
+            </div>
+        </div>
+
+        <!-- RECEIVED -->
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Received</div>
+                <div class="card-icon">✓</div>
+            </div>
+            <div class="card-number"
+                 th:text="${#lists.size(purchases.?[status == 'Received'])}">
+                0
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- PURCHASE TABLE -->
+    <section class="table-container">
+
+        <div class="table-header">
+            <h2>Purchase Records</h2>
+        </div>
+
+        <table>
+
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Material</th>
-                <th>Unit</th>
-                <th>Order</th>
                 <th>Quantity</th>
+                <th>Purchase Date</th>
                 <th>Status</th>
                 <th>Handled By</th>
-                <th>Action</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <!-- NO PURCHASES -->
+            <tr th:if="${#lists.isEmpty(purchases)}">
+                <td colspan="7" class="empty">
+                    No material purchases found.
+                </td>
             </tr>
 
-            <tr th:each="p : ${purchases}">
+            <!-- PURCHASE RECORDS -->
+            <tr th:each="purchase : ${purchases}">
 
-                <td th:text="${p.purchaseId}"></td>
+                <!-- ID -->
+                <td class="purchase-id"
+                    th:text="'#' + ${purchase.purchaseId}">
+                    #1
+                </td>
 
-                <td th:text="${materialTypeMap[p.materialTypeId]?.materialName}"></td>
-
-                <td th:text="${materialTypeMap[p.materialTypeId]?.unit}"></td>
-
-                <td th:text="${p.orderId}"></td>
-
-                <td th:text="${p.quantity}"></td>
-
+                <!-- MATERIAL NAME (CHANGED: String key lookup) -->
                 <td>
-                    <span
-                            class="status-badge"
-                            th:classappend="${p.status}"
-                            th:text="${p.status}">
+                    <th:block th:each="type : ${materialTypes}">
+        <span th:if="${type.materialTypeId == purchase.materialTypeId}"
+              th:text="${type.materialName}">
+            Natural Rubber
+        </span>
+                    </th:block>
+                </td>
+
+                <!-- QUANTITY -->
+                <td class="quantity"
+                    th:text="${purchase.quantity}">
+                    100
+                </td>
+
+                <!-- PURCHASE DATE -->
+                <td th:text="${purchase.purchaseDate != null ?
+                              purchase.purchaseDate : '-'}">
+                    2026-10-06
+                </td>
+
+                <!-- STATUS -->
+                <td>
+                    <span th:if="${purchase.status == 'Pending'}"
+                          class="status pending">
+                        Pending
+                    </span>
+
+                    <span th:if="${purchase.status == 'Ordered'}"
+                          class="status ordered">
+                        Ordered
+                    </span>
+
+                    <span th:if="${purchase.status == 'Received'}"
+                          class="status received">
+                        Received
                     </span>
                 </td>
 
-                <td th:text="${p.handledBy}"></td>
+                <!-- HANDLED BY -->
+                <td th:text="${purchase.handledBy != null ?
+                              purchase.handledBy : '-'}">
+                    -
+                </td>
 
+                <!-- ACTIONS -->
                 <td>
-                    <button
-                            type="button"
-                            class="edit-btn"
-                            th:attr="onclick=${'editRow(' + p.purchaseId + ',' + p.materialTypeId + ',' + (p.orderId != null ? p.orderId : 'null') + ',' + p.quantity + ',&quot;' + p.status + '&quot;,' + p.handledBy + ')'}">
-                        Edit
-                    </button>
+                    <div class="actions">
+
+                        <!-- ORDERED → PENDING -->
+                        <form th:if="${purchase.status == 'Ordered'}"
+                              th:action="@{/sourcing/purchases/{id}/status(id=${purchase.purchaseId})}"
+                              method="post">
+
+                            <input type="hidden" name="status" value="Pending">
+
+                            <button type="submit" class="next-btn">
+                                Pending
+                            </button>
+
+                        </form>
+
+
+                        <!-- PENDING → RECEIVED -->
+                        <form th:if="${purchase.status == 'Pending'}"
+                              th:action="@{/sourcing/purchases/{id}/status(id=${purchase.purchaseId})}"
+                              method="post">
+
+                            <input type="hidden" name="status" value="Received">
+
+                            <button type="submit" class="next-btn">
+                                Receive
+                            </button>
+
+                        </form>
+
+                        <!-- RECEIVED LOCK -->
+                        <span th:if="${purchase.status == 'Received'}"
+                              class="locked">
+                            🔒 Locked
+                        </span>
+
+                    </div>
                 </td>
 
             </tr>
 
+            </tbody>
+
         </table>
 
-    </div>
+    </section>
 
+    <!-- ADD PURCHASE FORM -->
+    <section class="form-section"
+             id="addPurchaseForm">
 
-    <div class="form-section">
+        <div class="form-header">
+            <h2>Add material purchase</h2>
+        </div>
 
-        <h2 id="formTitle">Add Purchase</h2>
+        <form id="purchaseForm"
+              th:action="@{/sourcing/purchases/save}"
+              method="post">
+              class="purchase-form">
 
-        <form
-                th:action="@{/material-purchases}"
-                th:object="${newPurchase}"
-                method="post">
+            <!-- MATERIAL TYPE -->
+            <div class="form-group">
+                <label for="materialTypeId">Material Type</label>
 
-            <input
-                    type="hidden"
-                    id="purchaseId"
-                    th:field="*{purchaseId}"/>
+                <select id="materialTypeId"
+                        name="materialTypeId"
+                        required>
 
+                    <option value="">Select material type</option>
 
-            <label>Material Type</label>
+                    <option th:each="type : ${materialTypes}"
+                            th:value="${type.materialTypeId}"
+                            th:text="${type.materialName + ' (' + type.unit + ')'}">
+                        Natural Rubber (kg)
+                    </option>
 
-            <select
-                    id="materialTypeId"
-                    th:field="*{materialTypeId}"
-                    onchange="updateUnit()">
+                </select>
+            </div>
 
-                <option
-                        th:each="mt : ${materialTypes}"
-                        th:value="${mt.materialTypeId}"
-                        th:text="${mt.materialName}"
-                        th:attr="data-unit=${mt.unit}">
-                </option>
+            <!-- QUANTITY -->
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number"
+                       id="quantity"
+                       name="quantity"
+                       min="1"
+                       required
+                       placeholder="Enter quantity">
+            </div>
 
-            </select>
+            <!-- HANDLED BY -->
+            <div class="form-group">
+                <label for="handledBy">Handled By</label>
+                <input type="number"
+                       id="handledBy"
+                       name="handledBy"
+                       placeholder="Enter employee ID"
+                       required>
+            </div>
 
-
-            <label>Order (optional)</label>
-
-            <input
-                    type="number"
-                    id="orderId"
-                    th:field="*{orderId}"/>
-
-
-            <label>
-                Quantity <span id="unitLabel"></span>
-            </label>
-
-            <input
-                    type="number"
-                    id="quantity"
-                    th:field="*{quantity}"
-                    min="1"/>
-
-
-            <label>Status</label>
-
-            <select
-                    id="status"
-                    th:field="*{status}">
-
-                <option value="Pending">Pending</option>
-                <option value="Ordered">Ordered</option>
-                <option value="Received">Received</option>
-
-            </select>
-
-
-            <label>Handled By</label>
-
-            <select
-                    id="handledBy"
-                    th:field="*{handledBy}">
-
-                <option
-                        th:each="s : ${staffList}"
-                        th:value="${s.staffId}"
-                        th:text="${s.firstName + ' ' + s.lastName}">
-                </option>
-
-            </select>
-
-
-            <button
-                    type="submit"
-                    id="submitBtn">
-                Add Purchase
-            </button>
+            <!-- BUTTON -->
+            <div class="form-actions">
+                <button type="submit" class="save-btn">
+                    Save Purchase
+                </button>
+            </div>
 
         </form>
 
-    </div>
+    </section>
 
-</div>
-
-
-<script>
-
-    function updateUnit() {
-
-        var select = document.getElementById("materialTypeId");
-
-        var selectedOption =
-            select.options[select.selectedIndex];
-
-        var unit =
-            selectedOption.getAttribute("data-unit");
-
-        document.getElementById("unitLabel").innerText =
-            unit ? "(" + unit + ")" : "";
-    }
-
-
-    window.onload = updateUnit;
-
-
-    function editRow(
-        purchaseId,
-        materialTypeId,
-        orderId,
-        quantity,
-        status,
-        handledBy
-    ) {
-
-        document.getElementById("purchaseId").value =
-            purchaseId;
-
-        document.getElementById("materialTypeId").value =
-            materialTypeId;
-
-        document.getElementById("orderId").value =
-            orderId === "null" ? "" : orderId;
-
-        document.getElementById("quantity").value =
-            quantity;
-
-        document.getElementById("status").value =
-            status;
-
-        document.getElementById("handledBy").value =
-            handledBy;
-
-        document.getElementById("formTitle").innerText =
-            "Edit Purchase";
-
-        document.getElementById("submitBtn").innerText =
-            "Update Purchase";
-
-        updateUnit();
-    }
-
-
-    function filterTable() {
-
-        var input =
-            document.getElementById("searchBox").value.toUpperCase();
-
-        var rows =
-            document.getElementById("purchaseTable")
-                .getElementsByTagName("tr");
-
-        for (var i = 1; i < rows.length; i++) {
-
-            var materialCell =
-                rows[i].getElementsByTagName("td")[1];
-
-            var statusCell =
-                rows[i].getElementsByTagName("td")[5];
-
-            if (materialCell && statusCell) {
-
-                var text =
-                    (
-                        materialCell.textContent +
-                        statusCell.textContent
-                    ).toUpperCase();
-
-                rows[i].style.display =
-                    text.indexOf(input) > -1 ? "" : "none";
-            }
-        }
-    }
-
-</script>
+</main>
 
 </body>
+
 </html>

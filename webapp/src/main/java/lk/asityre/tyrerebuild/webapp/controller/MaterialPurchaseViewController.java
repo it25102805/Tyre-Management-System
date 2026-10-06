@@ -1,20 +1,17 @@
 package lk.asityre.tyrerebuild.webapp.controller;
 
 import lk.asityre.tyrerebuild.webapp.model.MaterialPurchase;
-import lk.asityre.tyrerebuild.webapp.model.MaterialType;
 import lk.asityre.tyrerebuild.webapp.service.MaterialPurchaseService;
 import lk.asityre.tyrerebuild.webapp.service.MaterialTypeService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class MaterialPurchaseViewController {
@@ -25,67 +22,44 @@ public class MaterialPurchaseViewController {
     @Autowired
     private MaterialTypeService materialTypeService;
 
+    @GetMapping("/sourcing/purchases")
+    public String purchasesPage(Model model) {
 
-    @GetMapping("/material-purchases")
-    public String viewPurchases(Model model) {
+        model.addAttribute("purchases",
+                materialPurchaseService.getPurchases(null));
 
-        List<MaterialType> materialTypes =
-                materialTypeService.getAllMaterialTypes();
+        model.addAttribute("materialTypes",
+                materialTypeService.getAllMaterialTypes());
 
-        Map<Integer, MaterialType> materialTypeMap =
-                new HashMap<>();
+        // STAFF LIST GOES HERE (needs your Staff service, see below)
 
-        for (MaterialType mt : materialTypes) {
-            materialTypeMap.put(
-                    mt.getMaterialTypeId(),
-                    mt
-            );
-        }
-
-        model.addAttribute(
-                "purchases",
-                materialPurchaseService.getAllMaterialPurchase()
-        );
-
-        model.addAttribute(
-                "materialTypes",
-                materialTypes
-        );
-
-        model.addAttribute(
-                "materialTypeMap",
-                materialTypeMap
-        );
-
-        model.addAttribute(
-                "newPurchase",
-                new MaterialPurchase()
-        );
-
-        return "material-purchases";
+        return "purchases";
     }
 
-
-    @PostMapping("/material-purchases")
+    @PostMapping("/sourcing/purchases/save")
     public String savePurchase(
-            @ModelAttribute MaterialPurchase newPurchase) {
+            @ModelAttribute MaterialPurchase materialPurchase,
+            HttpSession session) {
 
-        if (newPurchase.getPurchaseId() != null) {
+        Integer userId = (Integer) session.getAttribute("userId");
 
-            // UPDATE existing purchase
-            materialPurchaseService.updatePurchase(
-                    newPurchase.getPurchaseId(),
-                    newPurchase
-            );
-
-        } else {
-
-            // ADD new purchase
-            materialPurchaseService.saveMaterialPurchase(
-                    newPurchase
-            );
+        if (userId == null) {
+            return "redirect:/login";
         }
 
-        return "redirect:/material-purchases";
+        materialPurchaseService.saveMaterialPurchase(
+                materialPurchase,
+                userId
+        );
+
+        return "redirect:/sourcing/purchases";
+    }
+
+    @PostMapping("/sourcing/purchases/{id}/status")
+    public String changeStatus(@PathVariable Integer id,
+                               @RequestParam String status) {
+
+        materialPurchaseService.updatePurchaseStatus(id, status);
+        return "redirect:/sourcing/purchases";
     }
 }

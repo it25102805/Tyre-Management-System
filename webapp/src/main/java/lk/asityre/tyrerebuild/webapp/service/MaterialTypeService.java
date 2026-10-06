@@ -18,6 +18,7 @@ public class MaterialTypeService {
     }
 
     public MaterialType getMaterialTypeById(Integer id) {
+
         return materialTypeRepository.findById(id).orElse(null);
     }
 

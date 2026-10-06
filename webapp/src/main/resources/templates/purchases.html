@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material Purchases | ASI Tyre</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/purchases.css}">
+    <style>
+        .modal:target {
+            display: flex;
+        }
+        a.close,
+        a.cancel-btn {
+            text-decoration: none;
+        }
+        /* Searchable Material Type */
+        .material-search {
+            position: relative;
+        }
+        .material-search-box {
+            position: relative;
+        }
+        .material-search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 40px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .material-search-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 17px;
+            color: #777;
+            pointer-events: none;
+        }
+        .material-results {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+        .material-result {
+            padding: 11px 14px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .material-result:hover {
+            background-color: #f3f4f6;
+        }
+        .no-materials {
+            padding: 11px 14px;
+            color: #888;
+            font-size: 14px;
+        }
+        .selected-material {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+<aside th:replace="~{fragments/sidebar :: sidebar('purchases')}"></aside>
+<main class="main">
+    <div class="topbar">
+        <div class="page-title">
+            <h1>Material Purchases</h1>
+            <p>Manage material orders and purchasing activities.</p>
+        </div>
+        <a href="#purchaseModal" class="add-btn">+ Add Purchase</a>
+    </div>
+    <!-- SUMMARY CARDS -->
+    <section class="cards">
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Total Purchases</div>
+                <div class="card-icon">📦</div>
+            </div>
+            <div class="card-number"
+                 th:text="${#lists.size(purchases)}">
+                0
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Pending</div>
+                <div class="card-icon">⏳</div>
+            </div>
+            <div class="card-number"
+                 th:text="${#lists.size(purchases.?[status == 'Pending'])}">
+                0
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Received</div>
+                <div class="card-icon">✓</div>
+            </div>
+            <div class="card-number"
+                 th:text="${#lists.size(purchases.?[status == 'Received'])}">
+                0
+            </div>
+        </div>
+    </section>
+    <!-- PURCHASE TABLE -->
+    <section class="table-container">
+        <div class="table-header">
+            <h2>Purchase Records</h2>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Material</th>
+                <th>Quantity</th>
+                <th>Purchase Date</th>
+                <th>Status</th>
+                <th>Handled By</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(purchases)}">
+                <td colspan="7" class="empty">
+                    No material purchases found.
+                </td>
+            </tr>
+            <tr th:each="purchase : ${purchases}">
+                <td class="purchase-id"
+                    th:text="'#' + ${purchase.purchaseId}">
+                    #1
+                </td>
+                <td>
+                    <th:block th:each="type : ${materialTypes}">
+                        <span th:if="${type.materialTypeId == purchase.materialTypeId}"
+                              th:text="${type.materialName}">
+                            Rubber Compound
+                        </span>
+                    </th:block>
+                </td>
+                <td class="quantity"
+                    th:text="${purchase.quantity}">
+                    100
+                </td>
+                <td th:text="${purchase.purchaseDate != null ? purchase.purchaseDate : '-'}">
+                    -
+                </td>
+                <td>
+                    <span class="status pending"
+                          th:if="${purchase.status == 'Pending'}">
+                        Pending
+                    </span>
+                    <span class="status ordered"
+                          th:if="${purchase.status == 'Ordered'}">
+                        Ordered
+                    </span>
+                    <span class="status received"
+                          th:if="${purchase.status == 'Received'}">
+                        Received
+                    </span>
+                </td>
+                <td th:text="${purchase.handledBy != null ? purchase.handledBy : '-'}">
+                    -
+                </td>
+                <td>
+                    <div class="actions">
+                        <!-- Pending → Ordered -->
+                        <form th:if="${purchase.status == 'Pending'}"
+                              th:action="@{/sourcing/purchases/{id}/status(id=${purchase.purchaseId})}"
+                              method="post">
+                            <input type="hidden"
+                                   name="status"
+                                   value="Ordered">
+                            <button type="submit"
+                                    class="next-btn">
+                                Order
+                            </button>
+                        </form>
+                        <!-- Ordered → Received -->
+                        <form th:if="${purchase.status == 'Ordered'}"
+                              th:action="@{/sourcing/purchases/{id}/status(id=${purchase.purchaseId})}"
+                              method="post">
+                            <input type="hidden"
+                                   name="status"
+                                   value="Received">
+                            <button type="submit"
+                                    class="next-btn">
+                                Receive
+                            </button>
+                        </form>
+                        <!-- Received -->
+                        <span class="locked"
+                              th:if="${purchase.status == 'Received'}">
+                            🔒 Locked
+                        </span>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+<!-- ADD PURCHASE MODAL -->
+<div class="modal" id="purchaseModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Purchase new material</h2>
+            <a href="#" class="close">
+                ×
+            </a>
+        </div>
+        <form th:action="@{/sourcing/purchases/save}"
+              method="post">
+            <!-- MATERIAL TYPE -->
+            <div class="form-group">
+                <label for="materialSearch">
+                    Material Type
+                </label>
+                <div class="material-search">
+                    <div class="material-search-box">
+                        <span class="material-search-icon">
+                            🔍
+                        </span>
+                        <input type="text"
+                               id="materialSearch"
+                               placeholder="Search material type..."
+                               autocomplete="off"
+                               required>
+                    </div>
+                    <!-- Hidden ID sent to Spring Boot -->
+                    <input type="hidden"
+                           id="materialTypeId"
+                           name="materialTypeId">
+                    <!-- Search Results -->
+                    <div class="material-results"
+                         id="materialResults">
+                        <div th:each="type : ${materialTypes}"
+                             class="material-result"
+                             th:attr="data-id=${type.materialTypeId},
+                                      data-name=${type.materialName},
+                                      data-unit=${type.unit}"
+                             th:text="${type.materialName + ' (' + type.unit + ')'}">
+                            Rubber Compound (kg)
+                        </div>
+                        <div class="no-materials"
+                             id="noMaterials"
+                             style="display: none;">
+                            No matching material found.
+                        </div>
+                    </div>
+                </div>
+                <div class="selected-material"
+                     id="selectedMaterial">
+                </div>
+            </div>
+            <!-- QUANTITY -->
+            <div class="form-group">
+                <label for="quantity">
+                    Quantity
+                </label>
+                <input type="number"
+                       id="quantity"
+                       name="quantity"
+                       min="1"
+                       required
+                       placeholder="Enter quantity">
+            </div>
+            <!-- MODAL FOOTER -->
+            <div class="modal-footer">
+                <a href="#"
+                   class="cancel-btn">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="save-btn">
+                    Save Purchase
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- SEARCH FUNCTION -->
+<script>
+    const searchInput = document.getElementById("materialSearch");
+    const resultsBox = document.getElementById("materialResults");
+    const materialIdInput = document.getElementById("materialTypeId");
+    const selectedMaterial = document.getElementById("selectedMaterial");
+    const noMaterials = document.getElementById("noMaterials");
+    const materials = document.querySelectorAll(".material-result");
+    // Open search results when user clicks the search box
+    searchInput.addEventListener("focus", function () {
+        resultsBox.style.display = "block";
+    });
+    // Search while typing
+    searchInput.addEventListener("input", function () {
+        const searchText = searchInput.value.toLowerCase().trim();
+        let found = false;
+        materials.forEach(function (material) {
+            const materialName =
+                material.getAttribute("data-name").toLowerCase();
+            if (materialName.includes(searchText)) {
+                material.style.display = "block";
+                found = true;
+            } else {
+                material.style.display = "none";
+            }
+        });
+        if (found) {
+            noMaterials.style.display = "none";
+        } else {
+            noMaterials.style.display = "block";
+        }
+        resultsBox.style.display = "block";
+        // User changed the text, so clear previous selection
+        materialIdInput.value = "";
+        selectedMaterial.textContent = "";
+    });
+    // Select a material
+    materials.forEach(function (material) {
+        material.addEventListener("click", function () {
+            const id = material.getAttribute("data-id");
+            const name = material.getAttribute("data-name");
+            const unit = material.getAttribute("data-unit");
+            // Put material name into search box
+            searchInput.value =
+                name + " (" + unit + ")";
+            // Put ID into hidden input
+            materialIdInput.value = id;
+            // Show selected message
+            selectedMaterial.textContent =
+                "✓ Selected: " + name;
+            // Close results
+            resultsBox.style.display = "none";
+        });
+    });
+    // Close search results when clicking outside
+    document.addEventListener("click", function (event) {
+        const materialSearch =
+            document.querySelector(".material-search");
+        if (!materialSearch.contains(event.target)) {
+            resultsBox.style.display = "none";
+        }
+    });
+    // Prevent submitting if a material was not selected
+    document.getElementById("purchaseForm").addEventListener("submit", function (event) {
+        if (materialIdInput.value === "") {
+            event.preventDefault();
+            alert("Please select a material type.");
+        }
+    });
+</script>
+</body>
+</html>
