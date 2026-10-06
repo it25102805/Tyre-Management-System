@@ -178,29 +178,30 @@
                 </td>
                 <td>
                     <div class="actions">
-                        <!-- Pending → Ordered -->
+                        <!-- PENDING → ORDERED -->
                         <form th:if="${purchase.status == 'Pending'}"
                               th:action="@{/sourcing/purchases/{id}/status(id=${purchase.purchaseId})}"
                               method="post">
-                            <input type="hidden"
-                                   name="status"
-                                   value="Ordered">
-                            <button type="submit"
-                                    class="next-btn">
+
+                            <input type="hidden" name="status" value="Ordered">
+
+                            <button type="submit" class="next-btn">
                                 Order
                             </button>
+
                         </form>
-                        <!-- Ordered → Received -->
+
+                        <!-- ORDERED → RECEIVED -->
                         <form th:if="${purchase.status == 'Ordered'}"
                               th:action="@{/sourcing/purchases/{id}/status(id=${purchase.purchaseId})}"
                               method="post">
-                            <input type="hidden"
-                                   name="status"
-                                   value="Received">
-                            <button type="submit"
-                                    class="next-btn">
+
+                            <input type="hidden" name="status" value="Received">
+
+                            <button type="submit" class="next-btn">
                                 Receive
                             </button>
+
                         </form>
                         <!-- Received -->
                         <span class="locked"

@@ -107,4 +107,8 @@ public class MaterialPurchaseService {
         return materialPurchaseRepository.save(materialPurchase);
     }
 
+    public boolean isMaterialTypeUsed(Integer materialTypeId) {
+        return materialPurchaseRepository.existsByMaterialTypeId(materialTypeId);
+    }
+
 }

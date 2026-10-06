@@ -9,26 +9,53 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import lk.asityre.tyrerebuild.webapp.service.MaterialPurchaseService;
+import java.util.List;
+import java.util.*;
 
 @Controller
 public class MaterialTypeViewController {
 
     @Autowired
     private MaterialTypeService materialTypeService;
+    @Autowired
+    private MaterialPurchaseService materialPurchaseService;
 
-    @GetMapping("/material-types")
+    @GetMapping("/sourcing/material-types")
     public String viewMaterialTypes(Model model) {
 
-        model.addAttribute("materialTypes",
-                materialTypeService.getAllMaterialTypes());
+        List<MaterialType> materialTypes =
+                materialTypeService.getAllMaterialTypes();
 
-        model.addAttribute("newMaterialType",
+        model.addAttribute(
+                "materialTypes",
+                materialTypes);
+
+        List<Integer> usedMaterialTypeIds =
+                new ArrayList<>();
+
+        for (MaterialType type : materialTypes) {
+
+            if (materialPurchaseService.isMaterialTypeUsed(
+                    type.getMaterialTypeId())) {
+
+                usedMaterialTypeIds.add(
+                        type.getMaterialTypeId());
+            }
+        }
+
+        model.addAttribute(
+                "usedMaterialTypeIds",
+                usedMaterialTypeIds);
+
+        model.addAttribute(
+                "newMaterialType",
                 new MaterialType());
 
         return "material-types";
     }
 
-    @PostMapping("/material-types")
+    @PostMapping("/sourcing/material-types")
     public String saveMaterialType(
             @ModelAttribute("newMaterialType") MaterialType materialType) {
 
@@ -46,14 +73,18 @@ public class MaterialTypeViewController {
             );
         }
 
-        return "redirect:/material-types";
+        return "redirect:/sourcing/material-types";
     }
 
-    @PostMapping("/material-types/delete/{id}")
+    @PostMapping("/sourcing/material-types/delete/{id}")
     public String deleteMaterialType(@PathVariable Integer id) {
+
+        if (materialPurchaseService.isMaterialTypeUsed(id)) {
+            return "redirect:/sourcing/material-types";
+        }
 
         materialTypeService.deleteMaterialType(id);
 
-        return "redirect:/material-types";
+        return "redirect:/sourcing/material-types";
     }
 }
