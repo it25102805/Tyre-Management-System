@@ -4,6 +4,9 @@ import lk.asityre.tyrerebuild.webapp.model.MaterialPurchase;
 import lk.asityre.tyrerebuild.webapp.model.Staff;
 import lk.asityre.tyrerebuild.webapp.repository.MaterialPurchaseRepository;
 import lk.asityre.tyrerebuild.webapp.repository.StaffRepository;
+import lk.asityre.tyrerebuild.webapp.model.StockMovement;
+import lk.asityre.tyrerebuild.webapp.repository.StockMovementRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,9 @@ public class MaterialPurchaseService {
     @Autowired
     private StaffRepository staffRepository;
 
+    @Autowired
+    private StockMovementRepository stockMovementRepository;
+
     public List<MaterialPurchase> getPurchases(String status) {
         if (status == null || status.isEmpty()) {
             return materialPurchaseRepository.findAllByOrderByPurchaseIdDesc();
@@ -35,7 +41,7 @@ public class MaterialPurchaseService {
         return null;
     }
 
-
+    @Transactional
     public MaterialPurchase updatePurchaseStatus(Integer id, String newStatus) {
         Optional<MaterialPurchase> result = materialPurchaseRepository.findById(id);
         if (result.isPresent()) {
@@ -43,7 +49,8 @@ public class MaterialPurchaseService {
             String currentStatus = existingPurchase.getStatus();
 
             boolean validStep =
-                    ("Pending".equals(currentStatus) && "Ordered".equals(newStatus)) || ("Ordered".equals(currentStatus) && "Received".equals(newStatus));
+                    ("Pending".equals(currentStatus) && "Ordered".equals(newStatus)) ||
+                            ("Ordered".equals(currentStatus) && "Received".equals(newStatus));
 
             if (!validStep) {
                 throw new IllegalArgumentException(
@@ -51,11 +58,23 @@ public class MaterialPurchaseService {
             }
 
             existingPurchase.setStatus(newStatus);
-            return materialPurchaseRepository.save(existingPurchase);
-        } else {
-            return null;
+            MaterialPurchase saved = materialPurchaseRepository.save(existingPurchase);
+
+            if ("Received".equals(newStatus)) {
+                StockMovement m = new StockMovement();
+                m.setMaterialTypeId(saved.getMaterialTypeId());
+                m.setOrderId(saved.getOrderId());
+                m.setMovementType("RECEIVED_FROM_PURCHASE");
+                m.setQuantity(saved.getQuantity());
+                m.setMovementDate(LocalDate.now());
+                m.setHandledBy(saved.getHandledBy());
+                stockMovementRepository.save(m);
+            }
+            return saved;
         }
+        return null;
     }
+
 
     public MaterialPurchase updatePurchase(Integer id, MaterialPurchase updatedDetails) {
         Optional<MaterialPurchase> result = materialPurchaseRepository.findById(id);
@@ -76,6 +95,7 @@ public class MaterialPurchaseService {
             return null;
         }
     }
+
 
     /*return = “I’m finished, here’s my result.”
       throw = “I can’t continue, something went wrong.”

@@ -1,20 +1,41 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
+
 <aside class="sidebar" th:fragment="sidebar(active)">
 
-    <div class="logo">ASI <span>TYRE</span></div>
+    <div class="logo">
+        <img th:src="@{/images/asi-tyre-logo.png}" alt="ASI Tyre">
+        <div>ASI <span>TYRE</span></div>
+    </div>
 
     <div class="menu-title">Inventory</div>
-    <a th:href="@{/sourcing/purchases}" class="menu-item"
-       th:classappend="${active == 'purchases'} ? 'active'">📦 Material Purchases</a>
-    <a th:href="@{/sourcing/material-types}" class="menu-item"
-       th:classappend="${active == 'types'} ? 'active'">🧱 Material Types</a>
+
+    <a th:href="@{/sourcing/purchases}"
+       class="menu-item"
+       th:classappend="${active == 'purchases'} ? 'active'">
+        📦 Material Purchases
+    </a>
+
+    <a th:href="@{/sourcing/material-types}"
+       class="menu-item"
+       th:classappend="${active == 'types'} ? 'active'">
+        🧱 Material Types
+    </a>
+
+    <a th:href="@{/sourcing/stock-movements}"
+       class="menu-item"
+       th:classappend="${active == 'stock-movements'} ? 'active'">
+        📊 Inventory
+    </a>
 
     <div class="menu-title spaced">Management</div>
+
     <a href="#" class="menu-item">📊 Dashboard</a>
+
     <a href="#" class="menu-item">🚚 Suppliers</a>
 
 </aside>
+
 </body>
 </html>

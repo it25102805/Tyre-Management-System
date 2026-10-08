@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory | ASI Tyre</title>
+
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/stock-movements.css}">
+</head>
+
+<body>
+
+<aside th:replace="~{fragments/sidebar :: sidebar('inventory')}"></aside>
+
+<main class="main">
+
+    <!-- Header -->
+    <div class="topbar">
+        <div class="page-title">
+            <h1>Inventory</h1>
+            <p>Track stock levels and record material movements.</p>
+        </div>
+
+        <a href="#movementModal" class="add-btn">+ Record Movement</a>
+    </div>
+
+    <p th:if="${success}" th:text="${success}" style="color:#047857;"></p>
+    <p th:if="${error}" th:text="${error}" style="color:#b91c1c;"></p>
+
+
+    <!-- Summary Cards -->
+    <section class="cards">
+
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Material Types</div>
+                <div class="card-icon">📦</div>
+            </div>
+            <div class="card-number" th:text="${#lists.size(levels)}">0</div>
+        </div>
+
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Low Stock</div>
+                <div class="card-icon">⚠</div>
+            </div>
+            <div class="card-number" th:text="${lowCount}">0</div>
+        </div>
+
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">At Quality Check</div>
+                <div class="card-icon">🔍</div>
+            </div>
+            <div class="card-number" th:text="${totalAtQuality}">0</div>
+        </div>
+
+    </section>
+
+
+    <!-- Stock Levels -->
+    <section class="table-container">
+
+        <div class="table-header">
+            <h2>Stock Levels</h2>
+
+            <div class="stock-tools">
+                <input type="text" id="stockSearch"
+                       placeholder="Search material...">
+
+                <select id="stockStatusFilter">
+                    <option value="">All status</option>
+                    <option value="ok">OK</option>
+                    <option value="low">Low Stock</option>
+                </select>
+            </div>
+        </div>
+
+        <table id="stockTable">
+            <thead>
+            <tr>
+                <th>Material</th>
+                <th>Usable Stock</th>
+                <th>At Quality</th>
+                <th>Reorder Level</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="s : ${levels}">
+                <td th:text="${s.name()}">Rubber Compound</td>
+                <td th:text="${s.usable() + ' ' + s.unit()}">0 kg</td>
+                <td th:text="${s.atQuality() + ' ' + s.unit()}">0 kg</td>
+                <td th:text="${s.reorderLevel() + ' ' + s.unit()}">50 kg</td>
+
+                <td>
+                    <span th:if="${s.low()}" class="status ordered">
+                        Low Stock
+                    </span>
+                    <span th:unless="${s.low()}" class="status received">
+                        OK
+                    </span>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(levels)}">
+                <td colspan="5" class="empty">No material types found.</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <p id="noStockResult" class="empty" style="display:none;">
+            No matching stock found.
+        </p>
+
+    </section>
+
+
+    <!-- Movement Records -->
+    <section class="table-container" style="margin-top:25px;">
+
+        <div class="table-header">
+            <h2>Movement Records</h2>
+
+            <div class="movement-tools">
+
+                <input type="text" id="movementSearch"
+                       placeholder="Search material...">
+
+                <select id="movementFilter">
+                    <option value="">All movements</option>
+                    <option value="SENT TO QUALITY">Sent to Quality</option>
+                    <option value="RETURNED FROM QUALITY">Returned from Quality</option>
+                    <option value="ISSUED TO PRODUCTION">Issued to Production</option>
+                    <option value="RECEIVED FROM PURCHASE">Received from Purchase</option>
+                </select>
+
+            </div>
+        </div>
+
+        <table id="movementTable">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Material</th>
+                <th>Type</th>
+                <th>Quantity</th>
+                <th>Date</th>
+                <th>Handled By</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="m : ${movements}">
+
+                <td th:text="'#' + ${m.movementId}">#1</td>
+
+                <td>
+                    <th:block th:each="type : ${materialTypes}">
+                        <span th:if="${type.materialTypeId == m.materialTypeId}"
+                              th:text="${type.materialName}">
+                        </span>
+                    </th:block>
+                </td>
+
+                <td>
+                    <span class="status"
+                          th:classappend="${m.movementType == 'RECEIVED_FROM_PURCHASE'
+                          ? 'received'
+                          : (m.movementType == 'ISSUED_TO_PRODUCTION'
+                          ? 'ordered' : 'pending')}"
+                          th:text="${#strings.replace(m.movementType, '_', ' ')}">
+                    </span>
+                </td>
+
+                <td th:text="${m.quantity}">10</td>
+                <td th:text="${m.movementDate}">2026-10-08</td>
+                <td th:text="${m.handledBy != null ? m.handledBy : '-'}">-</td>
+
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(movements)}">
+                <td colspan="6" class="empty">No stock movements found.</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <p id="noMovementResult" class="empty" style="display:none;">
+            No matching movements found.
+        </p>
+
+    </section>
+
+</main>
+
+
+<!-- Record Movement Modal -->
+<div class="modal" id="movementModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <h2>Record Stock Movement</h2>
+            <a href="#" class="close">×</a>
+        </div>
+
+        <form th:action="@{/sourcing/stock-movements/save}"
+              method="post"
+              class="purchase-form">
+
+            <div class="form-group">
+                <label>Material Type</label>
+
+                <select name="materialTypeId" required>
+                    <option value="">Select material type</option>
+
+                    <option th:each="type : ${materialTypes}"
+                            th:value="${type.materialTypeId}"
+                            th:text="${type.materialName + ' (' + type.unit + ')'}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Movement Type</label>
+
+                <select name="movementType" required>
+                    <option value="">Select movement type</option>
+                    <option value="SENT_TO_QUALITY">Sent to Quality</option>
+                    <option value="RETURNED_FROM_QUALITY">Returned from Quality</option>
+                    <option value="ISSUED_TO_PRODUCTION">Issued to Production</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+                <label>Quantity</label>
+
+                <input type="number"
+                       name="quantity"
+                       min="1"
+                       required
+                       placeholder="Enter quantity">
+            </div>
+
+            <div class="modal-footer">
+                <a href="#" class="cancel-btn">Cancel</a>
+                <button type="submit" class="save-btn">
+                    Save Movement
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<script>
+
+    function filterStock() {
+        let search = document.getElementById("stockSearch").value.toLowerCase();
+        let status = document.getElementById("stockStatusFilter").value.toLowerCase();
+        let rows = document.querySelectorAll("#stockTable tbody tr");
+        let visible = 0;
+
+        rows.forEach(row => {
+            if (row.cells.length < 5) return;
+
+            let material = row.cells[0].textContent.toLowerCase();
+            let stockStatus = row.cells[4].textContent.toLowerCase();
+
+            let show = material.includes(search) &&
+                (status === "" || stockStatus.includes(status));
+
+            row.style.display = show ? "" : "none";
+
+            if (show) visible++;
+        });
+
+        document.getElementById("noStockResult").style.display =
+            visible === 0 ? "block" : "none";
+    }
+
+    function filterMovements() {
+        let search = document.getElementById("movementSearch").value.toLowerCase();
+        let filter = document.getElementById("movementFilter").value.toLowerCase();
+        let rows = document.querySelectorAll("#movementTable tbody tr");
+        let visible = 0;
+
+        rows.forEach(row => {
+            if (row.cells.length < 6) return;
+
+            let material = row.cells[1].textContent.toLowerCase();
+            let type = row.cells[2].textContent.toLowerCase();
+
+            let show = material.includes(search) &&
+                (filter === "" || type.includes(filter));
+
+            row.style.display = show ? "" : "none";
+
+            if (show) visible++;
+        });
+
+        document.getElementById("noMovementResult").style.display =
+            visible === 0 ? "block" : "none";
+    }
+
+    document.getElementById("stockSearch").oninput = filterStock;
+    document.getElementById("stockStatusFilter").onchange = filterStock;
+
+    document.getElementById("movementSearch").oninput = filterMovements;
+    document.getElementById("movementFilter").onchange = filterMovements;
+
+</script>
+
+</body>
+</html>
