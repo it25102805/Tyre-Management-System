@@ -23,10 +23,11 @@ public class MainController {
         this.appointmentService = appointmentService;
     }
 
-    @GetMapping("/")
+    @GetMapping({"/", "/home", "/Home"})
     public String home() {
-        return "redirect:/login";
+        return "Home";
     }
+
 
     // ---------- Login ----------
     @GetMapping("/login")

@@ -13,12 +13,18 @@
         button { margin-top: 20px; background-color: #ac0606; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; width: 100%; }
         button:hover { background-color: #83060f; }
         .error { color: #ac0606; }
+        .success { color: #047857; background: #ecfdf5; padding: 10px 12px; border-radius: 6px; font-size: 14px; }
+
+        .forgot-link { text-align: right; margin: 8px 0 0; font-size: 13px; }
+        .forgot-link a { color: #ac0606; text-decoration: none; font-weight: 500; }
+        .forgot-link a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 <div class="box">
     <h1>Tire Rebuild &amp; Management</h1>
     <p class="error" th:if="${error}" th:text="${error}"></p>
+    <p class="success" th:if="${param.reset}">Password updated. Please log in.</p>
 
     <form th:action="@{/login}" method="post">
         <label>Email</label>
@@ -26,6 +32,10 @@
 
         <label>Password</label>
         <input type="password" name="password" required>
+
+        <div class="forgot-link">
+            <a th:href="@{/forgot-password}">Forgot password?</a>
+        </div>
 
         <button type="submit">Login</button>
     </form>

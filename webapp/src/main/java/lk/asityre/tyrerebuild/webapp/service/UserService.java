@@ -1,7 +1,7 @@
 package lk.asityre.tyrerebuild.webapp.service;
 
-import lk.asityre.tyrerebuild.webapp.model.User;                 // was com.tirerebuild.model.User
-import lk.asityre.tyrerebuild.webapp.repository.UserRepository;  // was com.tirerebuild.repository.UserRepository
+import lk.asityre.tyrerebuild.webapp.model.User;
+import lk.asityre.tyrerebuild.webapp.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,5 +52,24 @@ public class UserService {
             map.put(u.getUserId(), u);
         }
         return map;
+    }
+
+    // ---------- Forgot password ----------
+
+    /** Used by the forgot-password page to check the email is registered. */
+    public boolean emailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    /** Saves a new password for the user with this email. */
+    @Transactional
+    public void updatePassword(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+        // Saved as plain text, the same way login() checks it
+        // (findByEmailAndPassword compares the raw password).
+        user.setPassword(newPassword);
+        userRepository.save(user);
     }
 }
