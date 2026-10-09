@@ -25,6 +25,9 @@ public class StockMovement {
     @Column(name= "handled_by" , nullable = false)
     private Integer handledBy;
 
+    @Column(name = "order_id")
+    private Integer orderId;
+
     public Integer getMovementId() {
         return movementId;
     }
@@ -71,5 +74,13 @@ public class StockMovement {
 
     public void setHandledBy(Integer handledBy) {
         this.handledBy = handledBy;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
     }
 }

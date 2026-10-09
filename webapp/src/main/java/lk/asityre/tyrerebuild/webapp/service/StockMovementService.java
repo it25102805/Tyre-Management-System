@@ -1,42 +1,81 @@
 package lk.asityre.tyrerebuild.webapp.service;
 
 import lk.asityre.tyrerebuild.webapp.model.StockMovement;
+import lk.asityre.tyrerebuild.webapp.model.Staff;
+import lk.asityre.tyrerebuild.webapp.repository.StaffRepository;
 import lk.asityre.tyrerebuild.webapp.repository.StockMovementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class StockMovementService {
 
     @Autowired
-    private StockMovementRepository stockMovementRepository;
+    private StockMovementRepository movementRepository;
 
-    public List<StockMovement> getAllStockMovement() {
-        return stockMovementRepository.findAll();
+    @Autowired
+    private StaffRepository staffRepository;
+
+    public List<StockMovement> getAll() {
+        return movementRepository.findAllByOrderByMovementIdDesc();
     }
 
-    public StockMovement getStockMovementById(Integer id) {
-        return stockMovementRepository.findById(id).orElse(null);
+    // Usable stock = received - sent to quality + returned - issued
+    public int getUsableStock(Integer typeId) {
+        return movementRepository.sumQuantity(typeId, "RECEIVED_FROM_PURCHASE")
+                - movementRepository.sumQuantity(typeId, "SENT_TO_QUALITY")
+                + movementRepository.sumQuantity(typeId, "RETURNED_FROM_QUALITY")
+                - movementRepository.sumQuantity(typeId, "ISSUED_TO_PRODUCTION");
     }
 
-    public StockMovement saveStockMovement(StockMovement stockMovement) {
-        return stockMovementRepository.save(stockMovement);
+    // Items currently at quality check
+    public int getAtQuality(Integer typeId) {
+        return movementRepository.sumQuantity(typeId, "SENT_TO_QUALITY")
+                - movementRepository.sumQuantity(typeId, "RETURNED_FROM_QUALITY");
     }
 
-    public void deleteStockMovement(Integer id) {
-        stockMovementRepository.deleteById(id);
-    }
+    @Transactional
+    public StockMovement record(StockMovement m, Integer userId) {
 
-    public StockMovement updateMovement(Integer id, StockMovement updatedMovement) {
-        StockMovement existingMovement = stockMovementRepository.findById(id).orElse(null);
-        if (existingMovement != null) {
-            existingMovement.setMovementType(updatedMovement.getMovementType());
-            existingMovement.setQuantity(updatedMovement.getQuantity());
-            existingMovement.setHandledBy(updatedMovement.getHandledBy());
-            return stockMovementRepository.save(existingMovement);
+        if (m.getMaterialTypeId() == null) {
+            throw new IllegalArgumentException("Select a material type.");
         }
-        return null;
+
+        if (m.getQuantity() == null || m.getQuantity() <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero.");
+        }
+
+        String type = m.getMovementType();
+
+        if ("SENT_TO_QUALITY".equals(type)
+                || "ISSUED_TO_PRODUCTION".equals(type)) {
+
+            if (m.getQuantity() > getUsableStock(m.getMaterialTypeId())) {
+                throw new IllegalArgumentException("Not enough usable stock.");
+            }
+
+        } else if ("RETURNED_FROM_QUALITY".equals(type)) {
+
+            if (m.getQuantity() > getAtQuality(m.getMaterialTypeId())) {
+                throw new IllegalArgumentException(
+                        "Quantity is more than what is at quality check.");
+            }
+
+        } else {
+            throw new IllegalArgumentException("Invalid movement type.");
+        }
+
+        Staff staff = staffRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "The logged-in user is not registered as a staff member."));
+
+        m.setHandledBy(staff.getStaffId());
+        m.setMovementDate(LocalDate.now());
+
+        return movementRepository.save(m);
     }
 }
