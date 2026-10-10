@@ -2,40 +2,54 @@
 body { background: #f8f8f8; color: #1f2937; }
 
 /* Sidebar */
-.sidebar { position: fixed; left: 0; top: 0; width: 240px; height: 100vh;
-    background: #7f1d1d; color: white; padding: 28px 18px; }
+.sidebar {
+    position: fixed; left: 0; top: 0; width: 240px; height: 100vh; background: #7f1d1d; color: white; padding: 28px 18px;
+}
+
 .logo {
-    font-size: 23px;
-    font-weight: bold;
-    margin-bottom: 40px;
-    padding-left: 12px;
-    text-align: center;
+    font-size: 23px; font-weight: bold; margin-bottom: 40px; padding-left: 12px; text-align: center;
 }
 
 .logo img {
-    width: 120px;
-    height: auto;
-    display: block;
-    margin: 0 auto 8px;
+    width: 120px; height: auto; display: block; margin: 0 auto 8px;
 }
 
 .logo span {
     color: #fca5a5;
 }
 
-.menu-title { font-size: 11px; color: #fecaca; text-transform: uppercase;
-    letter-spacing: 1px; padding: 0 12px; margin-bottom: 12px; }
-.menu-title.spaced { margin-top: 30px; }
-.menu-item { display: flex; align-items: center; gap: 12px; padding: 13px 14px;
-    margin-bottom: 6px; border-radius: 10px; color: #fee2e2;
-    text-decoration: none; font-size: 14px; }
-.menu-item:hover, .menu-item.active { background: #b91c1c; color: white; }
+.menu-title {
+    font-size: 11px; color: #fecaca; text-transform: uppercase; letter-spacing: 1px; padding: 0 12px; margin-bottom: 12px;
+}
+
+.menu-title.spaced {
+    margin-top: 30px;
+}
+
+.menu-item {
+    display: flex; align-items: center; gap: 12px; padding: 13px 14px; margin-bottom: 6px; border-radius: 10px; color: #fee2e2; text-decoration: none; font-size: 14px;
+}
+
+.menu-item:hover, .menu-item.active {
+    background: #b91c1c; color: white;
+}
 
 /* Layout */
-.main { margin-left: 240px; padding: 32px; }
-.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
-.page-title h1 { font-size: 28px; margin-bottom: 7px; color: #111827; }
-.page-title p { color: #64748b; font-size: 14px; }
+.main {
+    margin-left: 240px; padding: 32px;
+}
+
+.topbar {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;
+}
+
+.page-title h1 {
+    font-size: 28px; margin-bottom: 7px; color: #111827;
+}
+
+.page-title p {
+    color: #64748b; font-size: 14px;
+}
 
 /* Buttons */
 .add-btn, .save-btn { border: none; background: #b91c1c; color: white;

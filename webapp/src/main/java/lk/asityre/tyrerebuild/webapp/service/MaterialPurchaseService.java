@@ -4,9 +4,6 @@ import lk.asityre.tyrerebuild.webapp.model.MaterialPurchase;
 import lk.asityre.tyrerebuild.webapp.model.Staff;
 import lk.asityre.tyrerebuild.webapp.repository.MaterialPurchaseRepository;
 import lk.asityre.tyrerebuild.webapp.repository.StaffRepository;
-import lk.asityre.tyrerebuild.webapp.model.StockMovement;
-import lk.asityre.tyrerebuild.webapp.repository.StockMovementRepository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +20,6 @@ public class MaterialPurchaseService {
     @Autowired
     private StaffRepository staffRepository;
 
-    @Autowired
-    private StockMovementRepository stockMovementRepository;
-
     public List<MaterialPurchase> getPurchases(String status) {
         if (status == null || status.isEmpty()) {
             return materialPurchaseRepository.findAllByOrderByPurchaseIdDesc();
@@ -41,40 +35,19 @@ public class MaterialPurchaseService {
         return null;
     }
 
-    @Transactional
     public MaterialPurchase updatePurchaseStatus(Integer id, String newStatus) {
         Optional<MaterialPurchase> result = materialPurchaseRepository.findById(id);
-        if (result.isPresent()) {
-            MaterialPurchase existingPurchase = result.get();
-            String currentStatus = existingPurchase.getStatus();
+        if (result.isEmpty()) return null;
 
-            boolean validStep =
-                    ("Pending".equals(currentStatus) && "Ordered".equals(newStatus)) ||
-                            ("Ordered".equals(currentStatus) && "Received".equals(newStatus));
-
-            if (!validStep) {
-                throw new IllegalArgumentException(
-                        "Cannot change status from " + currentStatus + " to " + newStatus);
-            }
-
-            existingPurchase.setStatus(newStatus);
-            MaterialPurchase saved = materialPurchaseRepository.save(existingPurchase);
-
-            if ("Received".equals(newStatus)) {
-                StockMovement m = new StockMovement();
-                m.setMaterialTypeId(saved.getMaterialTypeId());
-                m.setOrderId(saved.getOrderId());
-                m.setMovementType("RECEIVED_FROM_PURCHASE");
-                m.setQuantity(saved.getQuantity());
-                m.setMovementDate(LocalDate.now());
-                m.setHandledBy(saved.getHandledBy());
-                stockMovementRepository.save(m);
-            }
-            return saved;
+        MaterialPurchase p = result.get();
+        boolean validStep = "Ordered".equals(p.getStatus()) && "Pending".equals(newStatus);
+        if (!validStep) {
+            throw new IllegalArgumentException(
+                    "Cannot change status from " + p.getStatus() + " to " + newStatus);
         }
-        return null;
+        p.setStatus(newStatus);
+        return materialPurchaseRepository.save(p);
     }
-
 
     public MaterialPurchase updatePurchase(Integer id, MaterialPurchase updatedDetails) {
         Optional<MaterialPurchase> result = materialPurchaseRepository.findById(id);
@@ -96,7 +69,6 @@ public class MaterialPurchaseService {
         }
     }
 
-
     /*return = “I’m finished, here’s my result.”
       throw = “I can’t continue, something went wrong.”
     */
@@ -105,8 +77,14 @@ public class MaterialPurchaseService {
         if (materialPurchase.getQuantity() == null || materialPurchase.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than zero");
         }
+
+        /*
+
+        latest edit here
+
+         */
         if (materialPurchase.getStatus() == null || materialPurchase.getStatus().isEmpty()) {
-            materialPurchase.setStatus("Pending");
+            materialPurchase.setStatus("Ordered");
         }
         if (materialPurchase.getPurchaseDate() == null) {
             materialPurchase.setPurchaseDate(LocalDate.now());

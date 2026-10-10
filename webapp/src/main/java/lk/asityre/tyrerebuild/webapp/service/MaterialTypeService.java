@@ -23,8 +23,7 @@ public class MaterialTypeService {
     }
 
     public MaterialType saveMaterialType(MaterialType materialType) {
-        if (materialType.getReorderLevel() == null ||
-                materialType.getReorderLevel() <= 0) {
+        if (materialType.getReorderLevel() == null || materialType.getReorderLevel() <= 0) {
             throw new IllegalArgumentException("Reorder level must be greater than zero");
         }
         return materialTypeRepository.save(materialType);

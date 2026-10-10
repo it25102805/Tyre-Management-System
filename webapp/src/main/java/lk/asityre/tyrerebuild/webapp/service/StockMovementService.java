@@ -24,18 +24,10 @@ public class StockMovementService {
         return movementRepository.findAllByOrderByMovementIdDesc();
     }
 
-    // Usable stock = received - sent to quality + returned - issued
+    // Usable stock = received - issued
     public int getUsableStock(Integer typeId) {
         return movementRepository.sumQuantity(typeId, "RECEIVED_FROM_PURCHASE")
-                - movementRepository.sumQuantity(typeId, "SENT_TO_QUALITY")
-                + movementRepository.sumQuantity(typeId, "RETURNED_FROM_QUALITY")
                 - movementRepository.sumQuantity(typeId, "ISSUED_TO_PRODUCTION");
-    }
-
-    // Items currently at quality check
-    public int getAtQuality(Integer typeId) {
-        return movementRepository.sumQuantity(typeId, "SENT_TO_QUALITY")
-                - movementRepository.sumQuantity(typeId, "RETURNED_FROM_QUALITY");
     }
 
     @Transactional
@@ -49,29 +41,17 @@ public class StockMovementService {
             throw new IllegalArgumentException("Quantity must be greater than zero.");
         }
 
-        String type = m.getMovementType();
+        m.setMovementType("ISSUED_TO_PRODUCTION");
 
-        if ("SENT_TO_QUALITY".equals(type)
-                || "ISSUED_TO_PRODUCTION".equals(type)) {
-
-            if (m.getQuantity() > getUsableStock(m.getMaterialTypeId())) {
-                throw new IllegalArgumentException("Not enough usable stock.");
-            }
-
-        } else if ("RETURNED_FROM_QUALITY".equals(type)) {
-
-            if (m.getQuantity() > getAtQuality(m.getMaterialTypeId())) {
-                throw new IllegalArgumentException(
-                        "Quantity is more than what is at quality check.");
-            }
-
-        } else {
-            throw new IllegalArgumentException("Invalid movement type.");
+        if (m.getQuantity() > getUsableStock(m.getMaterialTypeId())) {
+            throw new IllegalArgumentException("Not enough usable stock.");
         }
 
-        Staff staff = staffRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "The logged-in user is not registered as a staff member."));
+        Staff staff = staffRepository.findByUserId(userId).orElse(null);
+
+        if (staff == null) {
+            throw new IllegalArgumentException("The logged-in user is not registered as a staff member.");
+        }
 
         m.setHandledBy(staff.getStaffId());
         m.setMovementDate(LocalDate.now());

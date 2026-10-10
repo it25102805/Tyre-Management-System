@@ -23,6 +23,12 @@
         🧱 Material Types
     </a>
 
+    <a th:href="@{/sourcing/quality-checks}"
+       class="menu-item"
+       th:classappend="${active == 'quality'} ? 'active'">
+        🔍 Quality Check
+    </a>
+
     <a th:href="@{/sourcing/stock-movements}"
        class="menu-item"
        th:classappend="${active == 'stock-movements'} ? 'active'">

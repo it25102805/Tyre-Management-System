@@ -18,7 +18,7 @@ import java.util.List;
 public class StockMovementViewController {
 
     public record StockLevel(Integer materialTypeId, String name, String unit,
-                             int usable, int atQuality, int reorderLevel, boolean low) {}
+                             int usable, int reorderLevel, boolean low) {}
 
     @Autowired
     private StockMovementService stockMovementService;
@@ -30,20 +30,16 @@ public class StockMovementViewController {
     public String page(Model model) {
         List<MaterialType> types = materialTypeService.getAllMaterialTypes();
         List<StockLevel> levels = new ArrayList<>();
-        int totalAtQuality = 0;
 
         for (MaterialType t : types) {
             int usable = stockMovementService.getUsableStock(t.getMaterialTypeId());
-            int atQ = stockMovementService.getAtQuality(t.getMaterialTypeId());
             int reorder = t.getReorderLevel() == null ? 0 : t.getReorderLevel();
-            totalAtQuality += atQ;
             levels.add(new StockLevel(t.getMaterialTypeId(), t.getMaterialName(),
-                    t.getUnit(), usable, atQ, reorder, usable < reorder));
+                    t.getUnit(), usable, reorder, usable < reorder));
         }
 
         model.addAttribute("levels", levels);
         model.addAttribute("lowCount", levels.stream().filter(StockLevel::low).count());
-        model.addAttribute("totalAtQuality", totalAtQuality);
         model.addAttribute("movements", stockMovementService.getAll());
         model.addAttribute("materialTypes", types);
         return "stock-movements";
