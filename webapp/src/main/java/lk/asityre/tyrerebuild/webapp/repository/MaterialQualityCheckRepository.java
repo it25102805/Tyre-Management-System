@@ -6,6 +6,4 @@ import java.util.List;
 
 public interface MaterialQualityCheckRepository extends JpaRepository<MaterialQualityCheck, Integer> {
     List<MaterialQualityCheck> findAllByOrderByMaterialCheckIdDesc();
-
-    long countByPurchaseId(Integer purchaseId);
 }
