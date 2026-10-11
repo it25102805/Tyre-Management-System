@@ -2,8 +2,11 @@ package lk.asityre.tyrerebuild.webapp.controller;
 
 import lk.asityre.tyrerebuild.webapp.model.MaterialPurchase;
 import lk.asityre.tyrerebuild.webapp.service.MaterialPurchaseService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 
@@ -15,8 +18,8 @@ public class MaterialPurchaseController {
     private MaterialPurchaseService materialPurchaseService;
 
     @GetMapping
-    public List<MaterialPurchase> getAll() {
-        return materialPurchaseService.getAllMaterialPurchase();
+    public List<MaterialPurchase> getAll(@RequestParam(required = false) String status) {
+        return materialPurchaseService.getPurchases(status);
     }
 
     @GetMapping("/{id}")
@@ -25,13 +28,18 @@ public class MaterialPurchaseController {
     }
 
     @PostMapping
-    public MaterialPurchase create(@RequestBody MaterialPurchase materialPurchase) {
-        return materialPurchaseService.saveMaterialPurchase(materialPurchase);
-    }
+    public MaterialPurchase create(
+            @RequestBody MaterialPurchase materialPurchase, HttpSession session) {
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
-        materialPurchaseService.deleteMaterialPurchase(id);
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            throw new IllegalArgumentException("User is not logged in.");
+        }
+
+        return materialPurchaseService.saveMaterialPurchase(
+                materialPurchase,
+                userId
+        );
     }
 
     @PutMapping("/{id}/status")
@@ -42,5 +50,10 @@ public class MaterialPurchaseController {
     @PutMapping("/{id}")
     public MaterialPurchase update(@PathVariable Integer id, @RequestBody MaterialPurchase purchaseDetails) {
         return materialPurchaseService.updatePurchase(id, purchaseDetails);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleBadRequest(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
