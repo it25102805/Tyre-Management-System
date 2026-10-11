@@ -4,7 +4,6 @@ import lk.asityre.tyrerebuild.webapp.model.MaterialPurchase;
 import lk.asityre.tyrerebuild.webapp.service.MaterialPurchaseService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 
@@ -52,8 +51,5 @@ public class MaterialPurchaseController {
         return materialPurchaseService.updatePurchase(id, purchaseDetails);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleBadRequest(IllegalArgumentException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
+
 }

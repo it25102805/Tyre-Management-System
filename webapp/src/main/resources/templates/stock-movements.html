@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\\<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -12,7 +12,7 @@
 
 <body>
 
-<aside th:replace="~{fragments/sidebar :: sidebar('inventory')}"></aside>
+<aside th:replace="~{fragments/sidebar :: sidebar('stock-movements')}"></aside>
 
 <main class="main">
 
@@ -31,7 +31,7 @@
 
 
     <!-- Summary Cards -->
-    <section class="cards">
+    <section class="cards" style="grid-template-columns: repeat(2, 1fr);">
 
         <div class="card">
             <div class="card-top">
@@ -47,14 +47,6 @@
                 <div class="card-icon">⚠</div>
             </div>
             <div class="card-number" th:text="${lowCount}">0</div>
-        </div>
-
-        <div class="card">
-            <div class="card-top">
-                <div class="card-title">At Quality Check</div>
-                <div class="card-icon">🔍</div>
-            </div>
-            <div class="card-number" th:text="${totalAtQuality}">0</div>
         </div>
 
     </section>
@@ -83,7 +75,6 @@
             <tr>
                 <th>Material</th>
                 <th>Usable Stock</th>
-                <th>At Quality</th>
                 <th>Reorder Level</th>
                 <th>Status</th>
             </tr>
@@ -93,7 +84,6 @@
             <tr th:each="s : ${levels}">
                 <td th:text="${s.name()}">Rubber Compound</td>
                 <td th:text="${s.usable() + ' ' + s.unit()}">0 kg</td>
-                <td th:text="${s.atQuality() + ' ' + s.unit()}">0 kg</td>
                 <td th:text="${s.reorderLevel() + ' ' + s.unit()}">50 kg</td>
 
                 <td>
@@ -107,7 +97,7 @@
             </tr>
 
             <tr th:if="${#lists.isEmpty(levels)}">
-                <td colspan="5" class="empty">No material types found.</td>
+                <td colspan="4" class="empty">No material types found.</td>
             </tr>
             </tbody>
         </table>
@@ -132,8 +122,6 @@
 
                 <select id="movementFilter">
                     <option value="">All movements</option>
-                    <option value="SENT TO QUALITY">Sent to Quality</option>
-                    <option value="RETURNED FROM QUALITY">Returned from Quality</option>
                     <option value="ISSUED TO PRODUCTION">Issued to Production</option>
                     <option value="RECEIVED FROM PURCHASE">Received from Purchase</option>
                 </select>
@@ -203,7 +191,7 @@
     <div class="modal-content">
 
         <div class="modal-header">
-            <h2>Record Stock Movement</h2>
+            <h2>Issue to Production</h2>
             <a href="#" class="close">×</a>
         </div>
 
@@ -225,18 +213,6 @@
             </div>
 
             <div class="form-group">
-                <label>Movement Type</label>
-
-                <select name="movementType" required>
-                    <option value="">Select movement type</option>
-                    <option value="SENT_TO_QUALITY">Sent to Quality</option>
-                    <option value="RETURNED_FROM_QUALITY">Returned from Quality</option>
-                    <option value="ISSUED_TO_PRODUCTION">Issued to Production</option>
-                </select>
-
-            </div>
-
-            <div class="form-group">
                 <label>Quantity</label>
 
                 <input type="number"
@@ -249,7 +225,7 @@
             <div class="modal-footer">
                 <a href="#" class="cancel-btn">Cancel</a>
                 <button type="submit" class="save-btn">
-                    Save Movement
+                    Save
                 </button>
             </div>
 
@@ -268,10 +244,10 @@
         let visible = 0;
 
         rows.forEach(row => {
-            if (row.cells.length < 5) return;
+            if (row.cells.length < 4) return;
 
             let material = row.cells[0].textContent.toLowerCase();
-            let stockStatus = row.cells[4].textContent.toLowerCase();
+            let stockStatus = row.cells[3].textContent.toLowerCase();
 
             let show = material.includes(search) &&
                 (status === "" || stockStatus.includes(status));

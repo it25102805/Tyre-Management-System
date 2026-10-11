@@ -74,8 +74,11 @@
     </style>
 </head>
 <body>
+
 <aside th:replace="~{fragments/sidebar :: sidebar('purchases')}"></aside>
+
 <main class="main">
+
     <div class="topbar">
         <div class="page-title">
             <h1>Material Purchases</h1>
@@ -83,8 +86,13 @@
         </div>
         <a href="#purchaseModal" class="add-btn">+ Add Purchase</a>
     </div>
+
+    <p th:if="${error}" th:text="${error}"
+       style="color:#b91c1c; margin-bottom:15px;"></p>
+
     <!-- SUMMARY CARDS -->
     <section class="cards">
+
         <div class="card">
             <div class="card-top">
                 <div class="card-title">Total Purchases</div>
@@ -95,9 +103,10 @@
                 0
             </div>
         </div>
+
         <div class="card">
             <div class="card-top">
-                <div class="card-title">Pending</div>
+                <div class="card-title">Awaiting Check</div>
                 <div class="card-icon">⏳</div>
             </div>
             <div class="card-number"
@@ -105,6 +114,7 @@
                 0
             </div>
         </div>
+
         <div class="card">
             <div class="card-top">
                 <div class="card-title">Received</div>
@@ -115,12 +125,16 @@
                 0
             </div>
         </div>
+
     </section>
+
     <!-- PURCHASE TABLE -->
     <section class="table-container">
+
         <div class="table-header">
             <h2>Purchase Records</h2>
         </div>
+
         <table>
             <thead>
             <tr>
@@ -133,17 +147,22 @@
                 <th>Actions</th>
             </tr>
             </thead>
+
             <tbody>
+
             <tr th:if="${#lists.isEmpty(purchases)}">
                 <td colspan="7" class="empty">
                     No material purchases found.
                 </td>
             </tr>
+
             <tr th:each="purchase : ${purchases}">
+
                 <td class="purchase-id"
                     th:text="'#' + ${purchase.purchaseId}">
                     #1
                 </td>
+
                 <td>
                     <th:block th:each="type : ${materialTypes}">
                         <span th:if="${type.materialTypeId == purchase.materialTypeId}"
@@ -152,13 +171,16 @@
                         </span>
                     </th:block>
                 </td>
+
                 <td class="quantity"
                     th:text="${purchase.quantity}">
                     100
                 </td>
+
                 <td th:text="${purchase.purchaseDate != null ? purchase.purchaseDate : '-'}">
                     -
                 </td>
+
                 <td>
                     <span class="status pending"
                           th:if="${purchase.status == 'Pending'}">
@@ -173,82 +195,80 @@
                         Received
                     </span>
                 </td>
+
                 <td th:text="${purchase.handledBy != null ? purchase.handledBy : '-'}">
                     -
                 </td>
+
                 <td>
                     <div class="actions">
-                        <!-- PENDING → ORDERED -->
-                        <form th:if="${purchase.status == 'Pending'}"
-                              th:action="@{/sourcing/purchases/{id}/status(id=${purchase.purchaseId})}"
-                              method="post">
 
-                            <input type="hidden" name="status" value="Ordered">
-
-                            <button type="submit" class="next-btn">
-                                Order
-                            </button>
-
-                        </form>
-
-                        <!-- ORDERED → RECEIVED -->
+                        <!-- ORDERED → PENDING (arrived) -->
                         <form th:if="${purchase.status == 'Ordered'}"
                               th:action="@{/sourcing/purchases/{id}/status(id=${purchase.purchaseId})}"
                               method="post">
-
-                            <input type="hidden" name="status" value="Received">
-
-                            <button type="submit" class="next-btn">
-                                Receive
-                            </button>
-
+                            <input type="hidden" name="status" value="Pending">
+                            <button type="submit" class="next-btn">Mark Arrived</button>
                         </form>
-                        <!-- Received -->
+
+                        <!-- PENDING → quality check page -->
+                        <a th:if="${purchase.status == 'Pending'}"
+                           th:href="@{/sourcing/quality-checks}"
+                           class="next-btn"
+                           style="text-decoration:none;">Quality Check</a>
+
+                        <!-- RECEIVED LOCK -->
                         <span class="locked"
                               th:if="${purchase.status == 'Received'}">
                             🔒 Locked
                         </span>
+
                     </div>
                 </td>
+
             </tr>
+
             </tbody>
         </table>
+
     </section>
+
 </main>
+
 <!-- ADD PURCHASE MODAL -->
 <div class="modal" id="purchaseModal">
     <div class="modal-content">
+
         <div class="modal-header">
             <h2>Purchase new material</h2>
-            <a href="#" class="close">
-                ×
-            </a>
+            <a href="#" class="close">&times;</a>
         </div>
-        <form th:action="@{/sourcing/purchases/save}"
+
+        <form id="purchaseForm"
+              th:action="@{/sourcing/purchases/save}"
               method="post">
+
             <!-- MATERIAL TYPE -->
             <div class="form-group">
-                <label for="materialSearch">
-                    Material Type
-                </label>
+                <label for="materialSearch">Material Type</label>
+
                 <div class="material-search">
                     <div class="material-search-box">
-                        <span class="material-search-icon">
-                            🔍
-                        </span>
+                        <span class="material-search-icon">🔍</span>
                         <input type="text"
                                id="materialSearch"
                                placeholder="Search material type..."
                                autocomplete="off"
                                required>
                     </div>
+
                     <!-- Hidden ID sent to Spring Boot -->
                     <input type="hidden"
                            id="materialTypeId"
                            name="materialTypeId">
+
                     <!-- Search Results -->
-                    <div class="material-results"
-                         id="materialResults">
+                    <div class="material-results" id="materialResults">
                         <div th:each="type : ${materialTypes}"
                              class="material-result"
                              th:attr="data-id=${type.materialTypeId},
@@ -264,15 +284,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="selected-material"
-                     id="selectedMaterial">
-                </div>
+
+                <div class="selected-material" id="selectedMaterial"></div>
             </div>
+
             <!-- QUANTITY -->
             <div class="form-group">
-                <label for="quantity">
-                    Quantity
-                </label>
+                <label for="quantity">Quantity</label>
                 <input type="number"
                        id="quantity"
                        name="quantity"
@@ -280,20 +298,17 @@
                        required
                        placeholder="Enter quantity">
             </div>
+
             <!-- MODAL FOOTER -->
             <div class="modal-footer">
-                <a href="#"
-                   class="cancel-btn">
-                    Cancel
-                </a>
-                <button type="submit"
-                        class="save-btn">
-                    Save Purchase
-                </button>
+                <a href="#" class="cancel-btn">Cancel</a>
+                <button type="submit" class="save-btn">Save Purchase</button>
             </div>
+
         </form>
     </div>
 </div>
+
 <!-- SEARCH FUNCTION -->
 <script>
     const searchInput = document.getElementById("materialSearch");
@@ -302,17 +317,19 @@
     const selectedMaterial = document.getElementById("selectedMaterial");
     const noMaterials = document.getElementById("noMaterials");
     const materials = document.querySelectorAll(".material-result");
+
     // Open search results when user clicks the search box
     searchInput.addEventListener("focus", function () {
         resultsBox.style.display = "block";
     });
+
     // Search while typing
     searchInput.addEventListener("input", function () {
         const searchText = searchInput.value.toLowerCase().trim();
         let found = false;
+
         materials.forEach(function (material) {
-            const materialName =
-                material.getAttribute("data-name").toLowerCase();
+            const materialName = material.getAttribute("data-name").toLowerCase();
             if (materialName.includes(searchText)) {
                 material.style.display = "block";
                 found = true;
@@ -320,42 +337,37 @@
                 material.style.display = "none";
             }
         });
-        if (found) {
-            noMaterials.style.display = "none";
-        } else {
-            noMaterials.style.display = "block";
-        }
+
+        noMaterials.style.display = found ? "none" : "block";
         resultsBox.style.display = "block";
+
         // User changed the text, so clear previous selection
         materialIdInput.value = "";
         selectedMaterial.textContent = "";
     });
+
     // Select a material
     materials.forEach(function (material) {
         material.addEventListener("click", function () {
             const id = material.getAttribute("data-id");
             const name = material.getAttribute("data-name");
             const unit = material.getAttribute("data-unit");
-            // Put material name into search box
-            searchInput.value =
-                name + " (" + unit + ")";
-            // Put ID into hidden input
+
+            searchInput.value = name + " (" + unit + ")";
             materialIdInput.value = id;
-            // Show selected message
-            selectedMaterial.textContent =
-                "✓ Selected: " + name;
-            // Close results
+            selectedMaterial.textContent = "✓ Selected: " + name;
             resultsBox.style.display = "none";
         });
     });
+
     // Close search results when clicking outside
     document.addEventListener("click", function (event) {
-        const materialSearch =
-            document.querySelector(".material-search");
+        const materialSearch = document.querySelector(".material-search");
         if (!materialSearch.contains(event.target)) {
             resultsBox.style.display = "none";
         }
     });
+
     // Prevent submitting if a material was not selected
     document.getElementById("purchaseForm").addEventListener("submit", function (event) {
         if (materialIdInput.value === "") {
@@ -364,5 +376,6 @@
         }
     });
 </script>
+
 </body>
 </html>

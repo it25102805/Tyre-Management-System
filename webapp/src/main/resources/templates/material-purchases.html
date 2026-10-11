@@ -16,7 +16,6 @@
 <!-- SIDEBAR -->
 <aside th:replace="~{fragments/sidebar :: sidebar('purchases')}"></aside>
 
-
 <!-- MAIN CONTENT -->
 <main class="main">
 
@@ -33,7 +32,6 @@
         </a>
 
     </div>
-
 
     <!-- SUMMARY CARDS -->
     <section class="cards">
@@ -75,7 +73,6 @@
         </div>
 
     </section>
-
 
     <!-- PURCHASE TABLE -->
     <section class="table-container">
@@ -166,40 +163,26 @@
                 <td>
                     <div class="actions">
 
-                        <!-- ORDERED → PENDING -->
+                        <!-- ORDERED → PENDING (arrived) -->
                         <form th:if="${purchase.status == 'Ordered'}"
                               th:action="@{/sourcing/purchases/{id}/status(id=${purchase.purchaseId})}"
                               method="post">
-
                             <input type="hidden" name="status" value="Pending">
-
-                            <button type="submit" class="next-btn">
-                                Pending
-                            </button>
-
+                            <button type="submit" class="next-btn">Mark Arrived</button>
                         </form>
 
-
-                        <!-- PENDING → RECEIVED -->
-                        <form th:if="${purchase.status == 'Pending'}"
-                              th:action="@{/sourcing/purchases/{id}/status(id=${purchase.purchaseId})}"
-                              method="post">
-
-                            <input type="hidden" name="status" value="Received">
-
-                            <button type="submit" class="next-btn">
-                                Receive
-                            </button>
-
-                        </form>
+                        <!-- PENDING → quality check page -->
+                        <a th:if="${purchase.status == 'Pending'}"
+                           th:href="@{/sourcing/quality-checks}" class="next-btn"
+                           style="text-decoration:none;">Quality Check</a>
 
                         <!-- RECEIVED LOCK -->
-                        <span th:if="${purchase.status == 'Received'}"
-                              class="locked">
+                        <span th:if="${purchase.status == 'Received'}" class="locked">
                             🔒 Locked
                         </span>
 
                     </div>
+
                 </td>
 
             </tr>
@@ -251,16 +234,6 @@
                        min="1"
                        required
                        placeholder="Enter quantity">
-            </div>
-
-            <!-- HANDLED BY -->
-            <div class="form-group">
-                <label for="handledBy">Handled By</label>
-                <input type="number"
-                       id="handledBy"
-                       name="handledBy"
-                       placeholder="Enter employee ID"
-                       required>
             </div>
 
             <!-- BUTTON -->
