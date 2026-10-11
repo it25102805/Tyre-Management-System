@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class ComplaintViewController {
@@ -29,7 +30,17 @@ public class ComplaintViewController {
 
     @PostMapping("/complaints")
     public String addComplaint(@ModelAttribute Complaint newComplaint) {
-        complaintService.saveComplaint(newComplaint);
+        if (newComplaint.getComplaintId() == null) {
+            complaintService.saveComplaint(newComplaint);
+        } else {
+            complaintService.updateComplaint(newComplaint.getComplaintId(), newComplaint);
+        }
+        return "redirect:/complaints";
+    }
+
+    @PostMapping("/complaints/delete/{id}")
+    public String deleteComplaint(@PathVariable Integer id) {
+        complaintService.deleteComplaint(id);
         return "redirect:/complaints";
     }
 }

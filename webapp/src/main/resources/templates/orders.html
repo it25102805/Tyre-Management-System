@@ -180,7 +180,7 @@
 
         <input type="text"
                id="searchBox"
-               placeholder="Search by customer, tire, or status..."
+               placeholder="Search by customer or status..."
                onkeyup="filterTable()">
 
         <table id="orderTable">
@@ -188,7 +188,6 @@
             <tr>
                 <th>ID</th>
                 <th>Customer ID</th>
-                <th>Tire ID</th>
                 <th>Order Date</th>
                 <th>Required Date</th>
                 <th>Qty</th>
@@ -201,8 +200,6 @@
                 <td th:text="${order.orderId}"></td>
 
                 <td th:text="${order.customerId}"></td>
-
-                <td th:text="${order.tireId}"></td>
 
                 <td th:text="${order.orderDate}"></td>
 
@@ -222,7 +219,7 @@
                     <button type="button"
                             class="icon-btn edit-btn"
                             title="Edit"
-                            th:attr="onclick='editRow(' + ${order.orderId} + ',' + ${order.customerId} + ',' + ${order.tireId} + ',&quot;' + ${order.orderDate} + '&quot;,&quot;' + ${order.requiredDate} + '&quot;,' + ${order.quantity} + ',&quot;' + ${order.orderStatus} + '&quot;)'">
+                            th:attr="onclick='editRow(' + ${order.orderId} + ',' + ${order.customerId} + ',&quot;' + ${order.orderDate} + '&quot;,&quot;' + ${order.requiredDate} + '&quot;,' + ${order.quantity} + ',&quot;' + ${order.orderStatus} + '&quot;)'">
                         🖊️
                     </button>
 
@@ -268,13 +265,6 @@
             <input type="number"
                    id="customerId"
                    th:field="*{customerId}"
-                   min="1"
-                   required/>
-
-            <label>Tire ID</label>
-            <input type="number"
-                   id="tireId"
-                   th:field="*{tyreId}"
                    min="1"
                    required/>
 
@@ -324,11 +314,10 @@
 <script>
 
     // EDIT ORDER
-    function editRow(id, customerId, tireId, orderDate, requiredDate, quantity, status) {
+    function editRow(id, customerId, orderDate, requiredDate, quantity, status) {
 
         document.getElementById("orderId").value = id;
         document.getElementById("customerId").value = customerId;
-        document.getElementById("tireId").value = tireId;
         document.getElementById("orderDate").value = orderDate;
         document.getElementById("requiredDate").value = requiredDate;
         document.getElementById("quantity").value = quantity;
@@ -374,12 +363,10 @@
             if (cells.length > 0) {
 
                 var customerId = cells[1].textContent.trim();
-                var tireId     = cells[2].textContent.trim();
-                var status     = cells[6].textContent.trim().toUpperCase();
+                var status     = cells[5].textContent.trim().toUpperCase();
 
                 var match =
                     customerId.indexOf(input) > -1 ||
-                    tireId.indexOf(input) > -1     ||
                     status.indexOf(input) > -1;
 
                 rows[i].style.display = match ? "" : "none";

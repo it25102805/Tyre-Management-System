@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Complaints</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+            color: #2c3e50;
+        }
+
+        h1 {
+            color: #000000;
+            border-bottom: 3px solid #ac0606;
+            padding-bottom: 10px;
+        }
+
+        .layout {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            align-items: flex-start;
+        }
+
+        .table-section {
+            flex: 2;
+        }
+
+        .form-section {
+            flex: 1;
+            position: sticky;
+            top: 20px;
+        }
+
+        #searchBox {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #8b4545;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f0f3f7;
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Specific colors for complaint statuses */
+        .badge-OPEN       { background: #fee2e2; color: #991b1b; }
+        .badge-IN_REVIEW  { background: #fef3c7; color: #92400e; }
+        .badge-RESOLVED   { background: #d1fae5; color: #065f46; }
+
+        /* Action buttons */
+        .icon-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            margin: 0 3px;
+            width: auto;
+        }
+
+        .edit-btn:hover,
+        .delete-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* Delete form inside table */
+        .delete-form {
+            display: inline;
+            background: none;
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+        }
+
+        /* Main form */
+        .complaint-form {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        button[type="submit"] {
+            margin-top: 20px;
+            background-color: #ac0606;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #83060f;
+        }
+
+        .delete-form button[type="submit"] {
+            margin-top: 0;
+            background-color: transparent;
+            color: inherit;
+            padding: 5px;
+            width: auto;
+        }
+
+        .delete-form button[type="submit"]:hover {
+            background-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Complaints</h1>
+
+<div class="layout">
+
+    <!-- TABLE -->
+    <div class="table-section">
+
+        <input type="text"
+               id="searchBox"
+               placeholder="Search by customer, order ID, or status..."
+               onkeyup="filterTable()">
+
+        <table id="complaintTable">
+
+            <tr>
+                <th>ID</th>
+                <th>Order ID</th>
+                <th>Customer ID</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+
+            <tr th:each="complaint : ${complaints}">
+
+                <td th:text="${complaint.complaintId}"></td>
+                <td th:text="${complaint.orderId}"></td>
+                <td th:text="${complaint.customerId}"></td>
+                <td th:text="${complaint.complaintDate}"></td>
+                <td th:text="${complaint.description}"></td>
+
+                <td>
+                    <span class="badge"
+                          th:classappend="'badge-' + ${complaint.status}"
+                          th:text="${complaint.status}"></span>
+                </td>
+
+                <td>
+                    <!-- EDIT BUTTON -->
+                    <button type="button"
+                            class="icon-btn edit-btn"
+                            title="Edit"
+                            th:attr="onclick='editRow(' + ${complaint.complaintId} + ',' + ${complaint.orderId} + ',' + ${complaint.customerId} + ',&quot;' + ${complaint.complaintDate} + '&quot;,&quot;' + ${complaint.description} + '&quot;,&quot;' + ${complaint.status} + '&quot;)'">
+                        🖊️
+                    </button>
+
+                    <!-- DELETE BUTTON -->
+                    <form th:action="@{/complaints/delete/{id}(id=${complaint.complaintId})}"
+                          method="post"
+                          class="delete-form"
+                          onsubmit="return confirm('Are you sure you want to delete this complaint?');">
+                        <button type="submit" class="icon-btn delete-btn" title="Delete">🗑</button>
+                    </form>
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+
+    <!-- ADD / EDIT FORM -->
+    <div class="form-section">
+
+        <h2 id="formTitle">Log Complaint</h2>
+
+        <form th:action="@{/complaints}"
+              th:object="${newComplaint}"
+              method="post"
+              class="complaint-form">
+
+            <input type="hidden"
+                   id="complaintId"
+                   th:field="*{complaintId}"/>
+
+            <label>Order ID</label>
+            <!-- Using a dropdown populated by the orders list passed from ComplaintViewController -->
+            <select id="orderId" th:field="*{orderId}" required>
+                <option value="" disabled selected>Select an Order</option>
+                <option th:each="order : ${orders}" 
+                        th:value="${order.orderId}" 
+                        th:text="'Order #' + ${order.orderId} + ' (Cust: ' + ${order.customerId} + ')'"></option>
+            </select>
+
+            <label>Customer ID</label>
+            <input type="number"
+                   id="customerId"
+                   th:field="*{customerId}"
+                   min="1"
+                   required/>
+
+            <label>Date</label>
+            <input type="date"
+                   id="complaintDate"
+                   th:field="*{complaintDate}"
+                   required/>
+
+            <label>Description</label>
+            <textarea id="description"
+                      th:field="*{description}"
+                      rows="3"
+                      placeholder="Brief description of the issue..."
+                      required></textarea>
+
+            <label>Status</label>
+            <select id="status" th:field="*{status}">
+                <option value="OPEN">OPEN</option>
+                <option value="IN_REVIEW">IN_REVIEW</option>
+                <option value="RESOLVED">RESOLVED</option>
+            </select>
+
+            <button type="submit" id="submitBtn">
+                Save Complaint
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+    // EDIT COMPLAINT
+    function editRow(id, orderId, customerId, complaintDate, description, status) {
+        document.getElementById("complaintId").value = id;
+        document.getElementById("orderId").value = orderId;
+        document.getElementById("customerId").value = customerId;
+        document.getElementById("complaintDate").value = complaintDate;
+        document.getElementById("description").value = description;
+        document.getElementById("status").value = status;
+
+        document.getElementById("formTitle").innerText = "Edit Complaint";
+        document.getElementById("submitBtn").innerText = "Update Complaint";
+    }
+
+    // SEARCH COMPLAINTS
+    function filterTable() {
+        var input = document.getElementById("searchBox").value.toUpperCase();
+        var rows = document.getElementById("complaintTable").getElementsByTagName("tr");
+
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName("td");
+            if (cells.length > 0) {
+                var orderId    = cells[1].textContent.trim();
+                var customerId = cells[2].textContent.trim();
+                var status     = cells[5].textContent.trim().toUpperCase();
+
+                var match =
+                    orderId.indexOf(input) > -1 ||
+                    customerId.indexOf(input) > -1 ||
+                    status.indexOf(input) > -1;
+
+                rows[i].style.display = match ? "" : "none";
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
