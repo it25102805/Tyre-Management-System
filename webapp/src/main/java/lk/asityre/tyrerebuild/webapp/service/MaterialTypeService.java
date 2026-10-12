@@ -4,7 +4,6 @@ import lk.asityre.tyrerebuild.webapp.model.MaterialType;
 import lk.asityre.tyrerebuild.webapp.repository.MaterialTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -12,14 +11,8 @@ public class MaterialTypeService {
 
     @Autowired
     private MaterialTypeRepository materialTypeRepository;
-
     public List<MaterialType> getAllMaterialTypes() {
         return materialTypeRepository.findAll();
-    }
-
-    public MaterialType getMaterialTypeById(Integer id) {
-
-        return materialTypeRepository.findById(id).orElse(null);
     }
 
     public MaterialType saveMaterialType(MaterialType materialType) {
@@ -34,7 +27,10 @@ public class MaterialTypeService {
     }
 
     public MaterialType updateMaterialType(Integer id, MaterialType updatedType) {
-        MaterialType existingType = materialTypeRepository.findById(id).orElse(null);
+        MaterialType existingType = null;
+        if (materialTypeRepository.findById(id).isPresent()) {
+            existingType = materialTypeRepository.findById(id).get();
+        }
         if (existingType != null) {
             existingType.setMaterialName(updatedType.getMaterialName());
             existingType.setUnit(updatedType.getUnit());
@@ -43,5 +39,4 @@ public class MaterialTypeService {
         }
         return null;
     }
-
 }

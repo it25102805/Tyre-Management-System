@@ -5,17 +5,20 @@ import lk.asityre.tyrerebuild.webapp.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class MaterialQualityCheckService {
 
-    @Autowired private MaterialQualityCheckRepository checkRepository;
-    @Autowired private MaterialPurchaseRepository purchaseRepository;
-    @Autowired private StockMovementRepository movementRepository;
-    @Autowired private StaffRepository staffRepository;
+    @Autowired
+    private MaterialQualityCheckRepository checkRepository;
+    @Autowired
+    private MaterialPurchaseRepository purchaseRepository;
+    @Autowired
+    private StockMovementRepository movementRepository;
+    @Autowired
+    private StaffRepository staffRepository;
 
     public List<MaterialQualityCheck> getAll() {
         return checkRepository.findAllByOrderByMaterialCheckIdDesc();
@@ -26,8 +29,7 @@ public class MaterialQualityCheckService {
     }
 
     @Transactional
-    public void recordCheck(Integer purchaseId, String grade, String result,
-                            String remarks, Integer userId) {
+    public void recordCheck(Integer purchaseId, String grade, String result, String remarks, Integer userId) {
 
         if (!"Passed".equals(result) && !"Failed".equals(result)) {
             throw new IllegalArgumentException("Result must be Passed or Failed.");
@@ -71,6 +73,5 @@ public class MaterialQualityCheckService {
             m.setHandledBy(staff.getStaffId());
             movementRepository.save(m);
         }
-        // Failed: purchase stays Pending, can be checked again
     }
 }
