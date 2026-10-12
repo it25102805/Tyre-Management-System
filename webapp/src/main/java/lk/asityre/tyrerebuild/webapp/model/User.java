@@ -12,15 +12,24 @@ public class User {
     private Integer userId;
 
     @Column(name = "first_name")
-    private String firstName;      // was: name
+    private String firstName;
 
     @Column(name = "last_name")
-    private String lastName;       // new, NOT NULL in the table
+    private String lastName;
 
-    private String username;       // new, NOT NULL and unique in the table
+    private String username;
     private String email;
     private String password;
-    private String role;           // ADMIN, MANAGER, EMPLOYEE or CUSTOMER (no VISITOR)
+    private String role;
+
+    @Column(name = "contact_number")
+    private String contactNumber;
+
+    @Column(name = "approval_status")
+    private String approvalStatus;
+
+    @Column(name = "status")
+    private String status;
 
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
@@ -43,6 +52,17 @@ public class User {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
+    public String getContactNumber() { return contactNumber; }
+    public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
+
+    public String getApprovalStatus() { return approvalStatus; }
+    public void setApprovalStatus(String approvalStatus) { this.approvalStatus = approvalStatus; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
     // Convenience so MainController and dashboard.html can keep using "name"
-    public String getName() { return firstName + " " + lastName; }
+    public String getName() {
+        return firstName + " " + lastName;
+    }
 }

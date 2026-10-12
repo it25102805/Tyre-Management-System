@@ -12,21 +12,24 @@ public class Order {
     @Column(name = "order_id")
     private Integer orderId;
 
-    @Column(name = "customer_id")
+    @Column(name = "customer_id", nullable = false)
     private Integer customerId;
 
-    @Column(name = "order_date")
+    @Column(name = "order_date", nullable = false)
     private LocalDate orderDate;
 
     @Column(name = "required_date")
     private LocalDate requiredDate;
 
-    private Integer quantity;
+    @Column(name = "tyre_size", nullable = false, length = 50)
+    private String tyreSize;
+
+    @Column(nullable = false)
+    private Integer quantity = 1;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "order_status")
-    private OrderStatus orderStatus;
-
+    @Column(name = "order_status", nullable = false)
+    private OrderStatus orderStatus = OrderStatus.PENDING;
 
     public enum OrderStatus {
         PENDING,
@@ -35,7 +38,6 @@ public class Order {
         COMPLETED,
         CANCELLED
     }
-
 
     public Integer getOrderId() {
         return orderId;
@@ -67,6 +69,14 @@ public class Order {
 
     public void setRequiredDate(LocalDate requiredDate) {
         this.requiredDate = requiredDate;
+    }
+
+    public String getTyreSize() {
+        return tyreSize;
+    }
+
+    public void setTyreSize(String tyreSize) {
+        this.tyreSize = tyreSize;
     }
 
     public Integer getQuantity() {
