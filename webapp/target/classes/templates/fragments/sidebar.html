@@ -35,12 +35,13 @@
         📊 Inventory
     </a>
 
-    <div class="menu-title spaced">Management</div>
+    <div class="menu-title spaced">Client Support</div>
 
-    <a href="#" class="menu-item">📊 Dashboard</a>
-
-    <a href="#" class="menu-item">🚚 Suppliers</a>
-
+    <a th:href="@{/complaints}"
+       class="menu-item"
+       th:classappend="${active == 'complaints'} ? 'active'">
+        💬 Complaints
+    </a>
 </aside>
 
 </body>
