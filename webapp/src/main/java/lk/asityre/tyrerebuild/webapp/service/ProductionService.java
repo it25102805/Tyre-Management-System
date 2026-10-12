@@ -2,7 +2,6 @@ package lk.asityre.tyrerebuild.webapp.service;
 
 import lk.asityre.tyrerebuild.webapp.model.Tyre;
 import lk.asityre.tyrerebuild.webapp.repository.TyreRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,40 +16,36 @@ public class ProductionService {
         this.tyreRepository = tyreRepository;
     }
 
-
     public List<Tyre> getAllTyres() {
         return tyreRepository.findAllByOrderByTyreIdDesc();
     }
-
 
     public Tyre getTyre(Integer id) {
         return tyreRepository.findById(id).orElse(null);
     }
 
-
-    public void updateStage(Integer tyreId, String stage) {
-
+    public void updateStage(Integer tyreId, Tyre.RebuildStage stage) {
         Tyre tyre = getTyre(tyreId);
-
         if (tyre == null) {
             return;
         }
 
-        Tyre.RebuildStage rebuildStage =
-                Tyre.RebuildStage.valueOf(stage);
+        tyre.setRebuildStage(stage);
 
-        tyre.setRebuildStage(rebuildStage);
-
-        if (rebuildStage == Tyre.RebuildStage.COMPLETED) {
+        if (stage == Tyre.RebuildStage.COMPLETED) {
             tyre.setCompletedDate(LocalDate.now());
         }
 
         tyreRepository.save(tyre);
     }
 
+    public void updateStage(Integer tyreId, String stage) {
+        if (stage != null) {
+            updateStage(tyreId, Tyre.RebuildStage.valueOf(stage.toUpperCase()));
+        }
+    }
 
     public void saveTyre(Tyre tyre) {
-
         if (tyre.getReceivedDate() == null) {
             tyre.setReceivedDate(LocalDate.now());
         }

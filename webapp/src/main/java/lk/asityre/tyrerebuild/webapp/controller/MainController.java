@@ -1,14 +1,12 @@
-package lk.asityre.tyrerebuild.webapp.controller;   // was com.tirerebuild.controller
+package lk.asityre.tyrerebuild.webapp.controller;
 
-import lk.asityre.tyrerebuild.webapp.model.User;                      // was com.tirerebuild.model.User
-import lk.asityre.tyrerebuild.webapp.service.AppointmentService;      // was com.tirerebuild.service.AppointmentService
-import lk.asityre.tyrerebuild.webapp.service.UserService;             // was com.tirerebuild.service.UserService
+import lk.asityre.tyrerebuild.webapp.model.User;
+import lk.asityre.tyrerebuild.webapp.service.AppointmentService;
+import lk.asityre.tyrerebuild.webapp.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 import java.util.Optional;
 
@@ -68,7 +66,13 @@ public class MainController {
                            @RequestParam String time, @RequestParam String purpose,
                            Model model) {
         try {
-            userService.registerVisitor(name, email, password, date, time, purpose);
+            // Split the single "name" string into firstName and lastName
+            String[] nameParts = name.trim().split("\\s+", 2);
+            String firstName = nameParts[0];
+            String lastName = nameParts.length > 1 ? nameParts[1] : "";
+
+            // Pass the split names to the UserService
+            userService.registerVisitor(firstName, lastName, email, password, date, time, purpose);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "register";

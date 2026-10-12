@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class StockMovementViewController {
-
-    public record StockLevel(Integer materialTypeId, String name, String unit,
-                             int usable, int reorderLevel, boolean low) {}
+public class StockMovementController {
 
     @Autowired
     private StockMovementService stockMovementService;
@@ -28,20 +25,34 @@ public class StockMovementViewController {
 
     @GetMapping("/sourcing/stock-movements")
     public String page(Model model) {
+
         List<MaterialType> types = materialTypeService.getAllMaterialTypes();
         List<StockLevel> levels = new ArrayList<>();
 
-        for (MaterialType t : types) {
-            int usable = stockMovementService.getUsableStock(t.getMaterialTypeId());
-            int reorder = t.getReorderLevel() == null ? 0 : t.getReorderLevel();
-            levels.add(new StockLevel(t.getMaterialTypeId(), t.getMaterialName(),
-                    t.getUnit(), usable, reorder, usable < reorder));
+        for (MaterialType type : types) {
+            int usable = stockMovementService.getUsableStock(type.getMaterialTypeId());
+
+            int reorder = 0;
+            if (type.getReorderLevel() != null) {
+                reorder = type.getReorderLevel();
+            }
+
+            StockLevel level = new StockLevel(type.getMaterialTypeId(), type.getMaterialName(), type.getUnit(), usable, reorder, usable < reorder);
+            levels.add(level);
+        }
+
+        int lowCount = 0;
+        for (StockLevel level : levels) {
+            if (level.low()) {
+                lowCount++;
+            }
         }
 
         model.addAttribute("levels", levels);
-        model.addAttribute("lowCount", levels.stream().filter(StockLevel::low).count());
+        model.addAttribute("lowCount", lowCount);
         model.addAttribute("movements", stockMovementService.getAll());
         model.addAttribute("materialTypes", types);
+
         return "stock-movements";
     }
 
@@ -51,6 +62,7 @@ public class StockMovementViewController {
                        RedirectAttributes ra) {
 
         Integer userId = (Integer) session.getAttribute("userId");
+
         if (userId == null) {
             return "redirect:/login";
         }
@@ -61,6 +73,10 @@ public class StockMovementViewController {
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("error", e.getMessage());
         }
+
         return "redirect:/sourcing/stock-movements";
+    }
+
+    public record StockLevel(Integer materialTypeId, String name, String unit, int usable, int reorderLevel, boolean low) {
     }
 }

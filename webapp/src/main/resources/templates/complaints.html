@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaints | ASI Tyre</title>
+
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/purchases.css}">
+    <style>
+        .modal:target {
+            display: flex;
+        }
+        a.close,
+        a.cancel-btn {
+            text-decoration: none;
+        }
+        /* Custom status badge colors for complaints */
+        .status.open { background-color: #fef08a; color: #854d0e; }
+        .status.in_review { background-color: #bfdbfe; color: #1e40af; }
+        .status.resolved { background-color: #bbf7d0; color: #166534; }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside th:replace="~{fragments/sidebar :: sidebar('complaints')}"></aside>
+
+<main class="main">
+
+    <!-- HEADER -->
+    <div class="topbar">
+        <div class="page-title">
+            <h1>Customer Complaints</h1>
+            <p>Track and manage issues regarding tyre rebuild orders.</p>
+        </div>
+
+        <!-- ONLY CUSTOMERS CAN ADD COMPLAINTS -->
+        <a th:if="${session.role == 'CUSTOMER'}" href="#complaintModal" class="add-btn">
+            + File Complaint
+        </a>
+    </div>
+
+    <!-- COMPLAINTS TABLE -->
+    <section class="table-container">
+
+        <div class="table-header">
+            <h2 th:text="${session.role == 'CUSTOMER' ? 'My Complaints' : 'All Customer Complaints'}">Records</h2>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Complaint ID</th>
+                <th>Order ID</th>
+                <!-- ONLY MANAGERS/ADMINS/EMPLOYEES SEE CUSTOMER ID -->
+                <th th:if="${session.role != 'CUSTOMER'}">Customer ID</th>
+                <th>Date</th>
+                <th style="max-width: 300px;">Description</th>
+                <th>Status</th>
+                <!-- ONLY MANAGERS/ADMINS SEE UPDATE COLUMN -->
+                <th th:if="${session.role == 'MANAGER' or session.role == 'ADMIN'}">Update Action</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:if="${#lists.isEmpty(complaints)}">
+                <td th:colspan="${session.role == 'CUSTOMER' ? 5 : 7}" class="empty">
+                    No complaints found.
+                </td>
+            </tr>
+
+            <tr th:each="c : ${complaints}">
+                <td th:text="'#' + ${c.complaintId}">#1</td>
+                <td th:text="'#' + ${c.orderId}">#1</td>
+
+                <td th:if="${session.role != 'CUSTOMER'}" th:text="'User ' + ${c.customerId}">User 1</td>
+
+                <td th:text="${c.complaintDate}">2026-10-12</td>
+
+                <td style="text-align: left; max-width: 300px;" th:text="${c.description}">Description text</td>
+
+                <td>
+                    <span class="status"
+                          th:classappend="${c.status == 'OPEN' ? 'open' : (c.status == 'IN_REVIEW' ? 'in_review' : 'resolved')}"
+                          th:text="${#strings.replace(c.status, '_', ' ')}">
+                    </span>
+                </td>
+
+                <!-- STATUS UPDATE FORM (MANAGERS/ADMINS ONLY) -->
+                <td th:if="${session.role == 'MANAGER' or session.role == 'ADMIN'}">
+                    <form th:action="@{/complaints/{id}/status(id=${c.complaintId})}" method="post" style="display:flex; gap:6px; justify-content:center;">
+                        <select name="status" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+                            <option value="OPEN" th:selected="${c.status == 'OPEN'}">OPEN</option>
+                            <option value="IN_REVIEW" th:selected="${c.status == 'IN_REVIEW'}">IN REVIEW</option>
+                            <option value="RESOLVED" th:selected="${c.status == 'RESOLVED'}">RESOLVED</option>
+                        </select>
+                        <button type="submit" class="next-btn" style="padding: 5px 12px;">Save</button>
+                    </form>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+
+    </section>
+
+</main>
+
+<!-- ADD COMPLAINT MODAL (CUSTOMERS ONLY) -->
+<div th:if="${session.role == 'CUSTOMER'}" class="modal" id="complaintModal">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <h2>File a New Complaint</h2>
+            <a href="#" class="close">&times;</a>
+        </div>
+
+        <form th:action="@{/complaints/submit}" method="post">
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="orderId">Order ID</label>
+                <input type="number"
+                       id="orderId"
+                       name="orderId"
+                       min="1"
+                       required
+                       placeholder="Enter the ID of the order you are complaining about"
+                       style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="description">Issue Description</label>
+                <textarea id="description"
+                          name="description"
+                          rows="4"
+                          required
+                          maxlength="255"
+                          placeholder="Describe the issue with your tyre rebuild..."></textarea>
+            </div>
+
+            <div class="modal-footer" style="margin-top: 25px;">
+                <a href="#" class="cancel-btn">Cancel</a>
+                <button type="submit" class="save-btn">Submit Complaint</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

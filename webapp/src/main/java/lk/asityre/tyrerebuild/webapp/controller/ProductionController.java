@@ -46,7 +46,14 @@ public class ProductionController {
 
     @PostMapping("/update-stage")
     public String updateStage(@RequestParam Integer tyreId, @RequestParam String stage) {
-        productionService.updateStage(tyreId, stage);
+        try {
+            // Safely parse the String to the Enum Type
+            Tyre.RebuildStage enumStage = Tyre.RebuildStage.valueOf(stage.toUpperCase());
+            productionService.updateStage(tyreId, enumStage);
+        } catch (IllegalArgumentException e) {
+            // Failsafe in case a bad string is passed from the UI
+            System.err.println("Invalid stage passed: " + stage);
+        }
         return "redirect:/production";
     }
 }
