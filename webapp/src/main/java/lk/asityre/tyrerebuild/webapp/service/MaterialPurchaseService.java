@@ -69,10 +69,6 @@ public class MaterialPurchaseService {
         }
     }
 
-    /*return = “I’m finished, here’s my result.”
-      throw = “I can’t continue, something went wrong.”
-    */
-
     public MaterialPurchase saveMaterialPurchase(MaterialPurchase materialPurchase,Integer userId) {
         if (materialPurchase.getQuantity() == null || materialPurchase.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than zero");
@@ -95,11 +91,11 @@ public class MaterialPurchaseService {
 
         if (staffResult.isEmpty()) {
             throw new IllegalArgumentException(
-                    "The logged-in user is not registered as a staff member."
+                    "The logged in user is not registered as a staff member."
             );
         }
 
-        // Save staff_id into handled_by
+        // Save staff id into handled_by
         Staff staff = staffResult.get();
         materialPurchase.setHandledBy(staff.getStaffId());
         return materialPurchaseRepository.save(materialPurchase);
