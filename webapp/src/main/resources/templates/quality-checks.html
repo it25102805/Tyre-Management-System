@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quality Checks | ASI Tyre</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/purchases.css}">
+</head>
+<body>
+
+<aside th:replace="~{fragments/sidebar :: sidebar('quality')}"></aside>
+
+<main class="main">
+
+    <div class="topbar">
+        <div class="page-title">
+            <h1>Material Quality Check</h1>
+            <p>Check arrived purchases. Stock is added only when a check passes.</p>
+        </div>
+    </div>
+
+    <p th:if="${success}" th:text="${success}" style="color:#047857; margin-bottom:15px;"></p>
+    <p th:if="${error}" th:text="${error}" style="color:#b91c1c; margin-bottom:15px;"></p>
+
+    <!-- AWAITING CHECK -->
+    <section class="table-container">
+        <div class="table-header"><h2>Awaiting Check</h2></div>
+        <table>
+            <thead>
+            <tr>
+                <th>Purchase</th><th>Material</th><th>Quantity</th>
+                <th>Grade</th><th>Result</th><th>Remarks</th><th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(awaiting)}">
+                <td colspan="7" class="empty">No purchases awaiting quality check.</td>
+            </tr>
+            <tr th:each="p : ${awaiting}">
+                <form th:action="@{/sourcing/quality-checks/save}" method="post">
+                    <td class="purchase-id" th:text="'#' + ${p.purchaseId}">#1</td>
+                    <td>
+                        <th:block th:each="type : ${materialTypes}">
+                            <span th:if="${type.materialTypeId == p.materialTypeId}"
+                                  th:text="${type.materialName}"></span>
+                        </th:block>
+                    </td>
+                    <td class="quantity" th:text="${p.quantity}">10</td>
+                    <td>
+                        <select name="qualityGrade">
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="result" required>
+                            <option value="Passed">Passed</option>
+                            <option value="Failed">Failed</option>
+                        </select>
+                    </td>
+                    <td><input type="text" name="remarks" maxlength="255" placeholder="Remarks"></td>
+                    <td>
+                        <input type="hidden" name="purchaseId" th:value="${p.purchaseId}">
+                        <button type="submit" class="next-btn">Save</button>
+                    </td>
+                </form>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- CHECK HISTORY -->
+    <section class="table-container" style="margin-top:25px;">
+        <div class="table-header"><h2>Check Records</h2></div>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th><th>Purchase</th><th>Date</th>
+                <th>Grade</th><th>Result</th><th>Remarks</th><th>Checked By</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(checks)}">
+                <td colspan="7" class="empty">No quality checks found.</td>
+            </tr>
+            <tr th:each="c : ${checks}">
+                <td class="purchase-id" th:text="'#' + ${c.materialCheckId}">#1</td>
+                <td th:text="'#' + ${c.purchaseId}">#1</td>
+                <td th:text="${c.checkDate != null ? c.checkDate : '-'}">2026-10-09</td>
+                <td th:text="${c.qualityGrade != null ? c.qualityGrade : '-'}">A</td>
+                <td>
+                    <span class="status"
+                          th:classappend="${c.result == 'Passed' ? 'received' :
+                                           (c.result == 'Failed' ? 'ordered' : 'pending')}"
+                          th:text="${c.result}">Passed</span>
+                </td>
+                <td th:text="${c.remarks != null ? c.remarks : '-'}">-</td>
+                <td th:text="${c.checkedBy}">1</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,166 @@
+.add-btn {
+    text-decoration: none;
+}
+
+.stock-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stock-tools input,
+.stock-tools select {
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0 12px;
+    background: white;
+}
+
+.stock-tools input {
+    width: 190px;
+}
+
+.stock-tools select {
+    width: 130px;
+}
+
+
+/* =========================================
+   MOVEMENT SEARCH + FILTER
+   ========================================= */
+
+.movement-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.movement-tools input,
+.movement-tools select {
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0 12px;
+    background: white;
+}
+
+.movement-tools input {
+    width: 190px;
+}
+
+.movement-tools select {
+    width: 180px;
+}
+
+
+/* =========================================
+   RECORD MOVEMENT FORM
+   ========================================= */
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+}
+
+
+/* =========================================
+   RECORD MOVEMENT MODAL
+   ========================================= */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal:target {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    width: 450px;
+    max-width: 90%;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Modal header */
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.modal-header .close {
+    text-decoration: none;
+    font-size: 28px;
+    color: #6b7280;
+}
+
+
+/* Modal footer */
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 700px) {
+
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .stock-tools,
+    .movement-tools {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .stock-tools input,
+    .movement-tools input {
+        width: 100%;
+    }
+
+    .stock-tools select,
+    .movement-tools select {
+        width: 100%;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+}
