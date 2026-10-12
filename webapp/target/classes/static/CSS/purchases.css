@@ -1,0 +1,171 @@
+/*
+Material Search and Quantity
+*/
+
+.material-search {
+    position: relative;
+}
+
+.material-search-box {
+    position: relative;
+}
+
+.material-search-box input,
+#quantity {
+    width: 100%;
+    height: 44px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.material-search-box input {
+    padding: 0 40px;
+}
+
+#quantity {
+    padding: 0 12px;
+}
+
+/* Material Search Icon
+*/
+.material-search-icon {
+    position: absolute;
+    top: 50%;
+    left: 13px;
+    transform: translateY(-50%);
+    font-size: 17px;
+    color: #777;
+    pointer-events: none;
+}
+
+/* Material Search Results
+ */
+.material-results {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 180px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.material-result {
+    padding: 11px 14px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.material-result:hover {
+    background: #f3f4f6;
+}
+
+.no-materials {
+    padding: 11px 14px;
+    color: #888;
+    font-size: 14px;
+}
+
+/* Selected Material
+ */
+.selected-material {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #555;
+}
+
+
+/*
+Purchase Table
+*/
+
+.purchase-id {
+    font-weight: 600;
+    color: #b91c1c;
+}
+
+.quantity {
+    font-weight: 600;
+}
+
+
+/*
+Purchase Status
+*/
+
+.pending {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.ordered {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.received {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+
+/*
+Action Buttons
+*/
+
+.next-btn {
+    padding: 7px 10px;
+    border: none;
+    border-radius: 7px;
+    background: #fef2f2;
+    color: #b91c1c;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.next-btn:hover {
+    background: #fee2e2;
+}
+
+.add-btn {
+    text-decoration: none;
+}
+
+a.close,
+a.cancel-btn {
+    text-decoration: none;
+}
+
+
+/*
+Modal
+*/
+
+.modal:target {
+    display: flex;
+}
+
+
+/*
+Hint Text
+*/
+
+.hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.hint a {
+    color: #b91c1c;
+}
