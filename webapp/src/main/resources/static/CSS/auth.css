@@ -1,0 +1,89 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 40px;
+    color: #2c3e50;
+}
+
+h1 {
+    color: #000000;
+    border-bottom: 3px solid #ac0606;
+    padding-bottom: 10px;
+}
+
+.box { max-width: 420px; margin: 40px auto; }
+.box.wide { max-width: 680px; }
+
+form {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+label { display: block; margin-top: 12px; font-weight: 600; font-size: 14px; }
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+input:focus, select:focus, textarea:focus { outline: none; border-color: #ac0606; }
+
+button {
+    margin-top: 20px;
+    background-color: #ac0606;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+button:hover { background-color: #83060f; }
+
+.error   { color: #ac0606; }
+.success { color: #047857; }
+
+/* Two-column layout for the longer staff form */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 18px;
+}
+.form-grid .full { grid-column: 1 / -1; }
+
+/* Customer / Staff chooser */
+.choice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 25px;
+}
+
+.choice-card {
+    display: block;
+    background: white;
+    padding: 28px 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    text-decoration: none;
+    color: #2c3e50;
+    border-top: 4px solid #ac0606;
+}
+.choice-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.15); }
+.choice-card .icon { font-size: 36px; }
+.choice-card h2 { margin: 10px 0 6px; font-size: 20px; }
+.choice-card p { margin: 0; font-size: 14px; color: #7f8c8d; }
+
+@media (max-width: 600px) {
+    .form-grid, .choice-grid { grid-template-columns: 1fr; }
+}

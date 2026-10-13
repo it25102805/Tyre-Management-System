@@ -3,11 +3,11 @@ package lk.asityre.tyrerebuild.webapp.repository;
 import lk.asityre.tyrerebuild.webapp.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    // UPDATE: Only allow login if the user is APPROVED and ACTIVE
     Optional<User> findByEmailAndPasswordAndApprovalStatusAndStatus(
             String email,
             String password,
@@ -15,5 +15,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             String status
     );
 
+    Optional<User> findByEmail(String email);
+
     boolean existsByEmail(String email);
+
+    List<User> findByRoleOrderByUserIdDesc(String role);
 }

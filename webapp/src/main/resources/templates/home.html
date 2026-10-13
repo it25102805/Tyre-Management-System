@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASI Tyre | Rethreading &amp; Rebuilding</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<header class="navbar">
+    <div class="container nav-inner">
+
+        <a th:href="@{/}" class="brand">
+            <img th:src="@{/images/asi-tyre-logo.png}" alt="ASI Tyre logo" class="brand-logo">
+            <div>
+                <div class="brand-name">ASI <span>TYRE</span></div>
+                <div class="brand-subtitle">Rethreading &amp; Rebuilding</div>
+            </div>
+        </a>
+
+        <nav class="nav-links">
+            <a href="#about">About Us</a>
+            <a href="#services">Services</a>
+            <a href="#process">Our Process</a>
+            <a href="#contact">Contact</a>
+            <a th:href="@{/login}" class="nav-login">Login</a>
+        </nav>
+
+    </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="home">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Giving Every Tyre<br>a <span>New Journey.</span></h1>
+
+            <p>
+                ASI Tyre inspects, retreads and rebuilds suitable tyres, so you
+                get more life from the tyres you already own.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="#services" class="btn btn-primary">Our Services</a>
+                <a th:href="@{/register}" class="btn btn-outline">Register</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="section" id="about">
+    <div class="container about-grid">
+
+        <div class="about-photo">
+            <img th:src="@{/images/workshop.jpg}" alt="ASI Tyre workshop">
+        </div>
+
+        <div class="about-content">
+            <h2>A Smarter Approach to Tyre Rebuilding</h2>
+
+            <p>
+                ASI Tyre offers tyre rethreading and rebuilding for customers who
+                value reliable work and responsible use of resources.
+            </p>
+
+            <p>
+                Every tyre is tracked through each production stage, and every
+                quality check is recorded, so our team always knows where your
+                order stands.
+            </p>
+
+            <ul class="goal-list">
+                <li><span>✓</span> Consistent, quality-focused service</li>
+                <li><span>✓</span> Clear order and production tracking</li>
+                <li><span>✓</span> Reuse of suitable tyre casings</li>
+            </ul>
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= SERVICES ================= -->
+<section class="section services" id="services">
+    <div class="container">
+
+        <div class="section-heading">
+            <h2>Our Services</h2>
+            <p>What we do for our customers.</p>
+        </div>
+
+        <div class="service-grid">
+
+            <article class="service-card">
+                <div class="service-icon">🛞</div>
+                <h3>Tyre Rethreading</h3>
+                <p>Suitable tyres get a renewed tread to extend their service life.</p>
+            </article>
+
+            <article class="service-card">
+                <div class="service-icon">🔍</div>
+                <h3>Quality Inspection</h3>
+                <p>Each tyre is checked and the result is recorded before it is approved.</p>
+            </article>
+
+            <article class="service-card">
+                <div class="service-icon">📋</div>
+                <h3>Client Ordering</h3>
+                <p>Place orders and follow their progress with expected completion dates.</p>
+            </article>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= PROCESS ================= -->
+<section class="section" id="process">
+    <div class="container">
+
+        <div class="section-heading">
+            <h2>How We Rebuild a Tyre</h2>
+            <p>Three stages, tracked from start to finish.</p>
+        </div>
+
+        <div class="process-grid">
+
+            <article class="process-card">
+                <span class="process-number">Step 1</span>
+                <h3>Inspect and prepare</h3>
+                <p>The tyre is registered, checked for suitability and prepared for rebuilding.</p>
+            </article>
+
+            <article class="process-card">
+                <span class="process-number">Step 2</span>
+                <h3>Rebuild</h3>
+                <p>The new tread is applied and the production record is updated at each stage.</p>
+            </article>
+
+            <article class="process-card">
+                <span class="process-number">Step 3</span>
+                <h3>Cure and final check</h3>
+                <p>The tyre is cured and finished, then passes a final quality check.</p>
+            </article>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="section contact" id="contact">
+    <div class="container">
+
+        <div class="section-heading">
+            <h2>Contact Us</h2>
+            <p>Questions about our services or an order? Get in touch.</p>
+        </div>
+
+        <div class="contact-grid">
+
+            <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <div>
+                    <strong>Location</strong>
+                    <span>116/C, Keragala, Henegama</span>
+                </div>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">📞</div>
+                <div>
+                    <strong>Telephone</strong>
+                    <span><a href="tel:+94776730918">077 673 0918</a></span>
+                </div>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">✉️</div>
+                <div>
+                    <strong>Email</strong>
+                    <span><a href="mailto:asi.tyre.rebuild@gmail.com">asi.tyre.rebuild@gmail.com</a></span>
+                </div>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">🕒</div>
+                <div>
+                    <strong>Business hours</strong>
+                    <span>Open 9:00 AM to 7:00 PM</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+    <div class="container footer-inner">
+
+        <a th:href="@{/}" class="brand">
+            <img th:src="@{/images/asi-tyre-logo.png}" alt="ASI Tyre logo" class="brand-logo">
+            <div>
+                <div class="brand-name">ASI <span>TYRE</span></div>
+                <div class="brand-subtitle">Rethreading &amp; Rebuilding</div>
+            </div>
+        </a>
+
+        <div class="footer-links">
+            <a th:href="@{/login}">Login</a>
+            <a th:href="@{/register}">Register</a>
+        </div>
+
+        <div class="footer-copy">
+            &copy; <span th:text="${#temporals.year(#temporals.createNow())}">2026</span>
+            ASI Tyre. All rights reserved.
+        </div>
+
+    </div>
+</footer>
+
+</body>
+</html>

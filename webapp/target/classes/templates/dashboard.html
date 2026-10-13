@@ -1,54 +1,212 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 40px; color: #2c3e50; }
-        h1 { color: #000000; border-bottom: 3px solid #ac0606; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-        th, td { padding: 12px 15px; text-align: center; }
-        th { background-color: #8b4545; color: white; }
-        tr:nth-child(even) { background-color: #f0f3f7; }
-        .save-btn { background-color: #3a6ea5; color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; }
-        .save-btn:hover { background-color: #2c557f; }
-        form { margin: 0; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | ASI Tyre</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 <body>
-
-<h1>Welcome, <span th:text="${name}"></span> (<span th:text="${role}"></span>)</h1>
-<p><a th:href="@{/logout}">Logout</a></p>
-
-<p th:if="${role == 'VISITOR'}">Your meeting is booked. After we meet, we will upgrade your account to customer.</p>
-
-<h2 th:text="${staff} ? 'All Appointments' : 'My Appointments'"></h2>
-
-<table>
-    <tr>
-        <th>ID</th><th>Name</th><th>Date</th><th>Time</th><th>Purpose</th><th>Status</th>
-        <th th:if="${staff}">Action</th>
-    </tr>
-    <tr th:each="a : ${appointments}">
-        <td th:text="${a.appointmentId}"></td>
-        <td th:text="${userMap[a.userId]?.name}"></td>
-        <td th:text="${a.appointmentDate}"></td>
-        <td th:text="${a.appointmentTime}"></td>
-        <td th:text="${a.purpose}"></td>
-        <td th:text="${a.status}"></td>
-        <td th:if="${staff}">
-            <form th:action="@{/status}" method="post">
-                <input type="hidden" name="id" th:value="${a.appointmentId}">
-                <select name="status">
-                    <option value="BOOKED">BOOKED</option>
-                    <option value="COMPLETED">COMPLETED</option>
-                    <option value="CANCELLED">CANCELLED</option>
-                </select>
-                <button type="submit" class="save-btn">Save</button>
-            </form>
-        </td>
-    </tr>
-</table>
-
+<!-- SIDEBAR -->
+<aside th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></aside>
+<!-- MAIN CONTENT -->
+<main class="main">
+    <!-- PAGE HEADER -->
+    <div class="topbar">
+        <div class="page-title">
+            <h1>Dashboard</h1>
+            <p>Welcome to the ASI Tyre Management System.</p>
+        </div>
+    </div>
+    <!-- ACCESS DENIED MESSAGE -->
+    <p class="error-message" th:if="${param.denied}">
+        You do not have access to that page.
+    </p>
+    <!-- AUTOMATIC TYRE IMAGE SLIDESHOW -->
+    <section class="dashboard-slideshow">
+        <!-- SLIDE 1 -->
+        <img class="slideshow-image"
+             th:src="@{/images/tyre-banner-1.jpg}"
+             alt="Tyre manufacturing">
+        <!-- SLIDE 2 -->
+        <img class="slideshow-image"
+             th:src="@{/images/tyre-banner-2.jpg}"
+             alt="Tyre production">
+        <!-- SLIDE 3 -->
+        <img class="slideshow-image"
+             th:src="@{/images/tyre-banner-3.jpg}"
+             alt="Tyre factory">
+        <!-- SLIDESHOW TEXT -->
+        <div class="slideshow-overlay">
+            <h2>Welcome to ASI Tyre</h2>
+            <p>
+                Smarter management for tyre rebuilding,
+                inventory, orders and production.
+            </p>
+        </div>
+    </section>
+    <!-- WELCOME MESSAGE -->
+    <section class="welcome-message">
+        <h2>
+            Welcome,
+            <span th:text="${name}">User</span>!
+        </h2>
+        <p>
+            You are logged in as a
+            <strong th:text="${#strings.replace(accessRole, '_', ' ').toLowerCase()}">
+                user
+            </strong>.
+        </p>
+    </section>
+    <!-- ADMIN-ONLY APPOINTMENT SUMMARY CARDS -->
+    <section class="cards"
+             th:if="${accessRole == 'ADMIN'}">
+        <!-- TOTAL APPOINTMENTS -->
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">
+                    Total Appointments
+                </div>
+                <div class="card-icon">📅</div>
+            </div>
+            <div class="card-number"
+                 th:text="${#lists.size(appointments)}">
+                0
+            </div>
+        </div>
+        <!-- BOOKED APPOINTMENTS -->
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">
+                    Booked Appointments
+                </div>
+                <div class="card-icon">⏳</div>
+            </div>
+            <div class="card-number"
+                 th:text="${#lists.size(appointments.?[status == 'BOOKED'])}">
+                0
+            </div>
+        </div>
+        <!-- COMPLETED APPOINTMENTS -->
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">
+                    Completed Appointments
+                </div>
+                <div class="card-icon">✓</div>
+            </div>
+            <div class="card-number"
+                 th:text="${#lists.size(appointments.?[status == 'COMPLETED'])}">
+                0
+            </div>
+        </div>
+    </section>
+    <!-- ADMIN-ONLY APPOINTMENTS TABLE -->
+    <section class="table-container"
+             th:if="${accessRole == 'ADMIN'}">
+        <!-- TABLE HEADER -->
+        <div class="table-header">
+            <h2>All Appointments</h2>
+            <p>
+                View and manage customer appointments.
+            </p>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Purpose</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- NO APPOINTMENTS -->
+            <tr th:if="${#lists.isEmpty(appointments)}">
+                <td colspan="7" class="empty">
+                    No appointments found.
+                </td>
+            </tr>
+            <!-- APPOINTMENT RECORDS -->
+            <tr th:each="a : ${appointments}">
+                <!-- APPOINTMENT ID -->
+                <td class="appointment-id"
+                    th:text="'#' + ${a.appointmentId}">
+                    #1
+                </td>
+                <!-- CUSTOMER NAME -->
+                <td th:text="${userMap[a.userId]?.name}">
+                    Customer
+                </td>
+                <!-- APPOINTMENT DATE -->
+                <td th:text="${a.appointmentDate}">
+                    2026-10-13
+                </td>
+                <!-- APPOINTMENT TIME -->
+                <td th:text="${a.appointmentTime}">
+                    10:00
+                </td>
+                <!-- PURPOSE -->
+                <td th:text="${a.purpose}">
+                    Consultation
+                </td>
+                <!-- APPOINTMENT STATUS -->
+                <td>
+                    <span th:if="${a.status == 'BOOKED'}"
+                          class="status booked">
+                        Booked
+                    </span>
+                    <span th:if="${a.status == 'COMPLETED'}"
+                          class="status completed">
+                        Completed
+                    </span>
+                    <span th:if="${a.status == 'CANCELLED'}"
+                          class="status cancelled">
+                        Cancelled
+                    </span>
+                    <span th:if="${a.status != 'BOOKED'
+                                  and a.status != 'COMPLETED'
+                                  and a.status != 'CANCELLED'}"
+                          class="status"
+                          th:text="${a.status}">
+                        Unknown
+                    </span>
+                </td>
+                <!-- UPDATE APPOINTMENT STATUS -->
+                <td>
+                    <form th:action="@{/status}"
+                          method="post"
+                          class="status-form">
+                        <input type="hidden"
+                               name="id"
+                               th:value="${a.appointmentId}">
+                        <select name="status" required>
+                            <option value="BOOKED"
+                                    th:selected="${a.status == 'BOOKED'}">
+                                Booked
+                            </option>
+                            <option value="COMPLETED"
+                                    th:selected="${a.status == 'COMPLETED'}">
+                                Completed
+                            </option>
+                            <option value="CANCELLED"
+                                    th:selected="${a.status == 'CANCELLED'}">
+                                Cancelled
+                            </option>
+                        </select>
+                        <button type="submit" class="save-btn">
+                            Save
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
 </body>
 </html>

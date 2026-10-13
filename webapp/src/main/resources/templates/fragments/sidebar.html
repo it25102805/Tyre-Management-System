@@ -1,56 +1,81 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-
 <aside class="sidebar" th:fragment="sidebar(active)">
-
+    <!-- LOGO -->
     <div class="logo">
         <img th:src="@{/images/asi-tyre-logo.png}" alt="ASI Tyre">
         <div>ASI <span>TYRE</span></div>
     </div>
-
-    <div class="menu-title">Inventory</div>
-
-    <a th:href="@{/sourcing/purchases}"
+    <!-- DASHBOARD -->
+    <a th:href="@{/dashboard}"
        class="menu-item"
-       th:classappend="${active == 'purchases'} ? 'active'">
-        📦 Material Purchases
+       th:classappend="${active == 'dashboard'} ? 'active'">
+        Dashboard
     </a>
-
-    <a th:href="@{/sourcing/material-types}"
-       class="menu-item"
-       th:classappend="${active == 'types'} ? 'active'">
-        🧱 Material Types
-    </a>
-
-    <a th:href="@{/sourcing/quality-checks}"
-       class="menu-item"
-       th:classappend="${active == 'quality'} ? 'active'">
-        🔍 Quality Check
-    </a>
-
-    <a th:href="@{/sourcing/stock-movements}"
-       class="menu-item"
-       th:classappend="${active == 'stock-movements'} ? 'active'">
-        📊 Inventory
-    </a>
-
-    <div class="menu-title spaced">Production</div>
-
-    <a th:href="@{/production}"
-       class="menu-item"
-       th:classappend="${active == 'production'} ? 'active'">
-        🏭 Production Pipeline
-    </a>
-
-    <div class="menu-title spaced">Client Support</div>
-
-    <a th:href="@{/complaints}"
-       class="menu-item"
-       th:classappend="${active == 'complaints'} ? 'active'">
-        💬 Complaints
+    <!-- INVENTORY -->
+    <th:block th:if="${session?.pages?.contains('inventory')}">
+        <div class="menu-title spaced">Inventory</div>
+        <a th:href="@{/sourcing/purchases}"
+           class="menu-item"
+           th:classappend="${active == 'purchases'} ? 'active'">
+            Material Purchases
+        </a>
+        <a th:href="@{/sourcing/material-types}"
+           class="menu-item"
+           th:classappend="${active == 'types'} ? 'active'">
+            Material Types
+        </a>
+        <a th:href="@{/sourcing/quality-checks}"
+           class="menu-item"
+           th:classappend="${active == 'quality'} ? 'active'">
+            Quality Check
+        </a>
+        <a th:href="@{/sourcing/stock-movements}"
+           class="menu-item"
+           th:classappend="${active == 'stock-movements'} ? 'active'">
+            Inventory
+        </a>
+    </th:block>
+    <!-- PRODUCTION -->
+    <th:block th:if="${session?.pages?.contains('production')}">
+        <div class="menu-title spaced">Production</div>
+        <a th:href="@{/production}"
+           class="menu-item"
+           th:classappend="${active == 'production'} ? 'active'">
+            Production Pipeline
+        </a>
+    </th:block>
+    <!-- CLIENT SUPPORT -->
+    <th:block th:if="${session?.pages?.contains('orders') or session?.pages?.contains('complaints')}">
+        <div class="menu-title spaced">Client Support</div>
+        <a th:if="${session?.pages?.contains('orders')}"
+           th:href="@{/orders}"
+           class="menu-item"
+           th:classappend="${active == 'orders'} ? 'active'">
+            Orders
+        </a>
+        <a th:if="${session?.pages?.contains('complaints')}"
+           th:href="@{/complaints}"
+           class="menu-item"
+           th:classappend="${active == 'complaints'} ? 'active'">
+            Complaints
+        </a>
+    </th:block>
+    <!-- ADMINISTRATION -->
+    <th:block th:if="${session?.pages?.contains('admin')}">
+        <div class="menu-title spaced">Administration</div>
+        <a th:href="@{/admin/registrations}"
+           class="menu-item"
+           th:classappend="${active == 'registrations'} ? 'active'">
+            Registrations
+        </a>
+    </th:block>
+    <!-- ACCOUNT -->
+    <div class="menu-title spaced">Account</div>
+    <a th:href="@{/logout}" class="menu-item">
+        Logout
     </a>
 </aside>
-
 </body>
 </html>

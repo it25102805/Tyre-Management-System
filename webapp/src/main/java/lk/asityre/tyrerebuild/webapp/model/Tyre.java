@@ -21,8 +21,6 @@ public class Tyre {
     @Column(name = "tyre_number", nullable = false, unique = true)
     private String tyreNumber;
 
-    private String brand;
-
     @Column(name = "tyre_size")
     private String tyreSize;
 
@@ -82,14 +80,6 @@ public class Tyre {
 
     public void setTyreNumber(String tyreNumber) {
         this.tyreNumber = tyreNumber;
-    }
-
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
     }
 
     public String getTyreSize() {

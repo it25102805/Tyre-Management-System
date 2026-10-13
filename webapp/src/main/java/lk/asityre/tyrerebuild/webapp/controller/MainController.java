@@ -1,13 +1,16 @@
 package lk.asityre.tyrerebuild.webapp.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lk.asityre.tyrerebuild.webapp.model.User;
+import lk.asityre.tyrerebuild.webapp.security.AccessPolicy;
 import lk.asityre.tyrerebuild.webapp.service.AppointmentService;
 import lk.asityre.tyrerebuild.webapp.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashSet;
 import java.util.Optional;
 
 @Controller
@@ -23,7 +26,7 @@ public class MainController {
 
     @GetMapping("/")
     public String home() {
-        return "redirect:/login";
+        return "home";
     }
 
     // ---------- Login ----------
@@ -35,16 +38,36 @@ public class MainController {
     @PostMapping("/login")
     public String login(@RequestParam String email, @RequestParam String password,
                         HttpSession session, Model model) {
-        Optional<User> found = userService.login(email, password);
+
+        Optional<User> found = userService.findByCredentials(email.trim(), password);
 
         if (found.isEmpty()) {
             model.addAttribute("error", "Email or password is incorrect.");
             return "login";
         }
+
         User user = found.get();
+
+        if ("PENDING".equals(user.getApprovalStatus())) {
+            model.addAttribute("error", "Your registration is still waiting for admin approval.");
+            return "login";
+        }
+        if (!"APPROVED".equals(user.getApprovalStatus())) {
+            model.addAttribute("error", "Your registration was not approved. Please contact the company.");
+            return "login";
+        }
+        if (!"ACTIVE".equals(user.getStatus())) {
+            model.addAttribute("error", "Your account is inactive.");
+            return "login";
+        }
+
+        String accessRole = userService.accessRoleOf(user);
+
         session.setAttribute("userId", user.getUserId());
         session.setAttribute("name", user.getName());
         session.setAttribute("role", user.getRole());
+        session.setAttribute("accessRole", accessRole);
+        session.setAttribute("pages", new HashSet<>(AccessPolicy.pagesFor(accessRole)));
         return "redirect:/dashboard";
     }
 
@@ -54,29 +77,58 @@ public class MainController {
         return "redirect:/login";
     }
 
-    // ---------- Register (visitor books a meeting) ----------
+    // ---------- Register (one page with a Customer / Staff switch) ----------
+
     @GetMapping("/register")
-    public String registerPage() {
+    public String registerPage(@RequestParam(defaultValue = "customer") String tab, Model model) {
+        model.addAttribute("tab", tab);
         return "register";
     }
 
-    @PostMapping("/register")
-    public String register(@RequestParam String name, @RequestParam String email,
-                           @RequestParam String password, @RequestParam String date,
-                           @RequestParam String time, @RequestParam String purpose,
-                           Model model) {
-        try {
-            // Split the single "name" string into firstName and lastName
-            String[] nameParts = name.trim().split("\\s+", 2);
-            String firstName = nameParts[0];
-            String lastName = nameParts.length > 1 ? nameParts[1] : "";
+    // Old separate pages now point to the single page
+    @GetMapping("/register/customer")
+    public String registerCustomerRedirect() {
+        return "redirect:/register";
+    }
 
-            // Pass the split names to the UserService
-            userService.registerVisitor(firstName, lastName, email, password, date, time, purpose);
+    @GetMapping("/register/staff")
+    public String registerStaffRedirect() {
+        return "redirect:/register?tab=staff";
+    }
+
+    @PostMapping("/register/customer")
+    public String registerCustomer(@RequestParam String firstName, @RequestParam String lastName,
+                                   @RequestParam String email, @RequestParam String phone,
+                                   @RequestParam String password, @RequestParam String date,
+                                   @RequestParam String time, @RequestParam String purpose,
+                                   Model model, RedirectAttributes redirect) {
+        try {
+            userService.registerCustomer(firstName.trim(), lastName.trim(), email.trim(),
+                    phone.trim(), password, date, time, purpose.trim());
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("tab", "customer");
             return "register";
         }
+        redirect.addFlashAttribute("success",
+                "Registration and meeting request sent. You can log in once the admin approves you.");
+        return "redirect:/login";
+    }
+
+    @PostMapping("/register/staff")
+    public String registerStaff(@RequestParam String firstName, @RequestParam String lastName,
+                                @RequestParam String email, @RequestParam String phone,
+                                @RequestParam String password,
+                                Model model, RedirectAttributes redirect) {
+        try {
+            userService.registerStaff(firstName.trim(), lastName.trim(), email.trim(), phone.trim(), password);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("tab", "staff");
+            return "register";
+        }
+        redirect.addFlashAttribute("success",
+                "Application submitted. You can log in once the admin approves you.");
         return "redirect:/login";
     }
 
@@ -86,7 +138,7 @@ public class MainController {
         String role = (String) session.getAttribute("role");
         if (role == null) return "redirect:/login";
 
-        boolean staff = role.equals("EMPLOYEE") || role.equals("ADMIN");
+        boolean staff = !"CUSTOMER".equals(role);
 
         if (staff) {
             model.addAttribute("appointments", appointmentService.getAll());
@@ -97,16 +149,18 @@ public class MainController {
 
         model.addAttribute("name", session.getAttribute("name"));
         model.addAttribute("role", role);
+        model.addAttribute("accessRole", session.getAttribute("accessRole"));
+        model.addAttribute("pages", session.getAttribute("pages"));
         model.addAttribute("staff", staff);
         model.addAttribute("userMap", userService.getUserMap());
         return "dashboard";
     }
 
-    // Employees and admins can change an appointment status
+    // Staff (not customers) can change an appointment status
     @PostMapping("/status")
     public String updateStatus(@RequestParam Integer id, @RequestParam String status, HttpSession session) {
         String role = (String) session.getAttribute("role");
-        if ("EMPLOYEE".equals(role) || "ADMIN".equals(role)) {
+        if (role != null && !"CUSTOMER".equals(role)) {
             appointmentService.updateStatus(id, status);
         }
         return "redirect:/dashboard";

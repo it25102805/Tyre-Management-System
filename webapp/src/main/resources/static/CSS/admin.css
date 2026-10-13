@@ -1,0 +1,39 @@
+/* Status colours for approval status */
+.st-PENDING  { background: #e67e22; }
+.st-APPROVED { background: #27ae60; }
+.st-REJECTED { background: #c0392b; }
+
+.scroll-x { overflow-x: auto; }
+
+.decision-form {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+.decision-form select {
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.btn-approve, .btn-reject {
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.btn-approve { background: #27ae60; }
+.btn-approve:hover { background: #1e8449; }
+.btn-reject { background: #ac0606; }
+.btn-reject:hover { background: #83060f; }
+
+.notes-cell {
+    max-width: 220px;
+    text-align: left;
+    white-space: normal;
+}

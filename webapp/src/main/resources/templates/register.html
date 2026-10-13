@@ -6,32 +6,59 @@
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 40px; color: #2c3e50; }
         h1 { color: #000000; border-bottom: 3px solid #ac0606; padding-bottom: 10px; }
-        .box { max-width: 420px; margin: 40px auto; }
+        .box { max-width: 460px; margin: 40px auto; }
         form { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
         label { display: block; margin-top: 12px; font-weight: 600; font-size: 14px; }
-        input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { margin-top: 20px; background-color: #ac0606; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; width: 100%; }
-        button:hover { background-color: #83060f; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 14px; }
+        input:focus, select:focus { outline: none; border-color: #ac0606; }
+        button.submit { margin-top: 20px; background-color: #ac0606; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; width: 100%; }
+        button.submit:hover { background-color: #83060f; }
         .error { color: #ac0606; }
+
+        /* Customer / Staff switch */
+        .tabs { display: flex; gap: 10px; margin: 20px 0; }
+        .tab-btn {
+            flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px;
+            background: white; color: #2c3e50; font-size: 15px; font-weight: 600; cursor: pointer;
+        }
+        .tab-btn:hover { border-color: #ac0606; }
+        .tab-btn.active { border-color: #ac0606; background: #ac0606; color: white; }
+
+        .form-panel { display: none; }
+        .form-panel.active { display: block; }
     </style>
 </head>
 <body>
 <div class="box">
-    <h1>Register &amp; Book a Meeting</h1>
+    <h1>Register</h1>
     <p class="error" th:if="${error}" th:text="${error}"></p>
 
-    <form th:action="@{/register}" method="post">
-        <label>Full Name</label>
-        <input type="text" name="name" required>
+    <div class="tabs">
+        <button type="button" class="tab-btn" id="tab-customer" data-tab="customer">🛞 Customer</button>
+        <button type="button" class="tab-btn" id="tab-staff" data-tab="staff">🧰 Staff</button>
+    </div>
+
+    <!-- ================= CUSTOMER FORM ================= -->
+    <form th:action="@{/register/customer}" method="post" class="form-panel" id="panel-customer">
+        <p>Book a meeting with us. You can log in after the admin approves you.</p>
+
+        <label>First Name</label>
+        <input type="text" name="firstName" maxlength="50" required>
+
+        <label>Last Name</label>
+        <input type="text" name="lastName" maxlength="50" required>
 
         <label>Email</label>
         <input type="email" name="email" required>
+
+        <label>Contact Number</label>
+        <input type="tel" name="phone" maxlength="10" minlength="10" pattern="07[0-9]{8}" inputmode="numeric" placeholder="07XXXXXXXX" title="Enter 10 digits starting with 07" required>
 
         <label>Password</label>
         <input type="password" name="password" required>
 
         <label>Meeting Date</label>
-        <input type="date" name="date" required>
+        <input type="date" name="date" class="meeting-date" required>
 
         <label>Meeting Time</label>
         <input type="time" name="time" required>
@@ -39,10 +66,61 @@
         <label>Purpose</label>
         <input type="text" name="purpose" maxlength="150" required>
 
-        <button type="submit">Register</button>
+        <button type="submit" class="submit">Register as Customer</button>
+    </form>
+
+    <!-- ================= STAFF FORM (short) ================= -->
+    <form th:action="@{/register/staff}" method="post" class="form-panel" id="panel-staff">
+        <p>Fill in your details. The admin will review them and decide.</p>
+
+        <label>First Name</label>
+        <input type="text" name="firstName" maxlength="50" required>
+
+        <label>Last Name</label>
+        <input type="text" name="lastName" maxlength="50" required>
+
+        <label>Email</label>
+        <input type="email" name="email" required>
+
+        <label>Contact Number</label>
+        <input type="tel" name="phone" maxlength="10" minlength="10" pattern="07[0-9]{8}" inputmode="numeric" placeholder="07XXXXXXXX" title="Enter 10 digits starting with 07" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <button type="submit" class="submit">Submit Application</button>
     </form>
 
     <p>Already registered? <a th:href="@{/login}">Login</a></p>
 </div>
+
+<script th:inline="javascript">
+    var startTab = /*[[${tab}]]*/ 'customer';
+
+    function showTab(name) {
+        ['customer', 'staff'].forEach(function (t) {
+            document.getElementById('panel-' + t).classList.toggle('active', t === name);
+            document.getElementById('tab-' + t).classList.toggle('active', t === name);
+        });
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () { showTab(btn.dataset.tab); });
+    });
+
+    // Contact number: digits only
+    document.querySelectorAll('input[name="phone"]').forEach(function (el) {
+        el.addEventListener('input', function () {
+            el.value = el.value.replace(/[^0-9]/g, '');
+        });
+    });
+
+    // No meeting date in the past
+    document.querySelectorAll('.meeting-date').forEach(function (el) {
+        el.min = new Date().toISOString().split('T')[0];
+    });
+
+    showTab(startTab === 'staff' ? 'staff' : 'customer');
+</script>
 </body>
 </html>

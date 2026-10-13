@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Registrations | ASI Tyre</title>
+
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/purchases.css}">
+    <link rel="stylesheet" th:href="@{/css/production.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+
+<body>
+
+<aside th:replace="~{fragments/sidebar :: sidebar('registrations')}"></aside>
+
+<main class="main">
+
+    <!-- PAGE HEADER -->
+    <div class="topbar">
+        <div class="page-title">
+            <h1>Registrations</h1>
+            <p>Review the forms people filled in, then approve or reject them. You can change a decision at any time.</p>
+        </div>
+    </div>
+
+    <!-- SUCCESS MESSAGE -->
+    <p th:if="${success}"
+       th:text="${success}"
+       style="color:#047857; margin-bottom:15px;">
+    </p>
+
+    <!-- ERROR MESSAGE -->
+    <p th:if="${error}"
+       th:text="${error}"
+       style="color:#b91c1c; margin-bottom:15px;">
+    </p>
+
+    <!-- ================= STAFF ================= -->
+    <section class="table-container">
+
+        <div class="table-header">
+            <h2>
+                Staff
+
+                <span class="count-pill"
+                      th:if="${pendingStaff > 0}"
+                      th:text="${pendingStaff} + ' pending'">
+                </span>
+            </h2>
+        </div>
+
+        <div class="scroll-x">
+
+            <table>
+
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                    <th>Decision</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <!-- NO STAFF -->
+                <tr th:if="${#lists.isEmpty(staffList)}">
+                    <td colspan="6" class="empty">
+                        No staff yet.
+                    </td>
+                </tr>
+
+                <!-- STAFF RECORDS -->
+                <tr th:each="s : ${staffList}"
+                    th:with="u=${userMap[s.userId]}">
+
+                    <!-- NAME -->
+                    <td class="purchase-id"
+                        th:text="${u != null ? u.name : 'Unknown'}">
+                    </td>
+
+                    <!-- EMAIL -->
+                    <td th:text="${u != null ? u.email : '-'}">
+                    </td>
+
+                    <!-- PHONE -->
+                    <td th:text="${u != null and u.contactNumber != null ? u.contactNumber : '-'}">
+                    </td>
+
+                    <!-- POSITION -->
+                    <td th:text="${s.role}">
+                    </td>
+
+                    <!-- STATUS -->
+                    <td>
+                        <span class="badge"
+                              th:classappend="'st-' + ${u != null ? u.approvalStatus : 'PENDING'}"
+                              th:text="${u != null ? u.approvalStatus : '-'}">
+                        </span>
+                    </td>
+
+                    <!-- APPROVE OR REJECT -->
+                    <td>
+                        <form th:action="@{/admin/registrations/staff}"
+                              method="post"
+                              class="decision-form">
+
+                            <input type="hidden"
+                                   name="userId"
+                                   th:value="${s.userId}"/>
+
+                            <select name="position">
+
+                                <option th:each="p : ${positions}"
+                                        th:value="${p}"
+                                        th:text="${p}"
+                                        th:selected="${p == s.role}">
+                                </option>
+
+                            </select>
+
+                            <button type="submit"
+                                    name="decision"
+                                    value="approve"
+                                    class="btn-approve">
+                                Approve
+                            </button>
+
+                            <button type="submit"
+                                    name="decision"
+                                    value="reject"
+                                    class="btn-reject">
+                                Reject
+                            </button>
+
+                        </form>
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <!-- ================= CUSTOMER REGISTRATIONS ================= -->
+    <section class="table-container" style="margin-top:25px;">
+
+        <div class="table-header">
+            <h2>
+                Customer Registrations
+
+                <span class="count-pill"
+                      th:if="${pendingCustomers > 0}"
+                      th:text="${pendingCustomers} + ' pending'">
+                </span>
+            </h2>
+        </div>
+
+        <div class="scroll-x">
+
+            <table>
+
+                <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Meeting Date</th>
+                    <th>Time</th>
+                    <th>Purpose</th>
+                    <th>Status</th>
+                    <th>Decision</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <!-- NO CUSTOMERS -->
+                <tr th:if="${#lists.isEmpty(customers)}">
+                    <td colspan="8" class="empty">
+                        No customers yet.
+                    </td>
+                </tr>
+
+                <!-- CUSTOMER RECORDS -->
+                <tr th:each="c : ${customers}"
+                    th:with="ap=${appointmentMap[c.userId]}">
+
+                    <!-- CUSTOMER NAME -->
+                    <td class="purchase-id"
+                        th:text="${c.name}">
+                    </td>
+
+                    <!-- EMAIL -->
+                    <td th:text="${c.email}">
+                    </td>
+
+                    <!-- PHONE -->
+                    <td th:text="${c.contactNumber != null ? c.contactNumber : '-'}">
+                    </td>
+
+                    <!-- MEETING DATE -->
+                    <td th:text="${ap != null ? ap.appointmentDate : '-'}">
+                    </td>
+
+                    <!-- MEETING TIME -->
+                    <td th:text="${ap != null ? ap.appointmentTime : '-'}">
+                    </td>
+
+                    <!-- PURPOSE -->
+                    <td class="notes-cell"
+                        th:text="${ap != null ? ap.purpose : '-'}">
+                    </td>
+
+                    <!-- STATUS -->
+                    <td>
+                        <span class="badge"
+                              th:classappend="'st-' + ${c.approvalStatus}"
+                              th:text="${c.approvalStatus}">
+                        </span>
+                    </td>
+
+                    <!-- APPROVE OR REJECT -->
+                    <td>
+                        <form th:action="@{/admin/registrations/customer}"
+                              method="post"
+                              class="decision-form">
+
+                            <input type="hidden"
+                                   name="userId"
+                                   th:value="${c.userId}"/>
+
+                            <button type="submit"
+                                    name="decision"
+                                    value="approve"
+                                    class="btn-approve">
+                                Approve
+                            </button>
+
+                            <button type="submit"
+                                    name="decision"
+                                    value="reject"
+                                    class="btn-reject">
+                                Reject
+                            </button>
+
+                        </form>
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>
