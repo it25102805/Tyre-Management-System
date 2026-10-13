@@ -307,10 +307,7 @@
 
         document.querySelectorAll("#materialTable tbody tr").forEach(function (row) {
 
-            if (row.cells.length >= 2 &&
-                row.cells[1].textContent.trim().toLowerCase() === name &&
-                row.cells[0].textContent.replace("#", "").trim() !== currentId) {
-
+            if (row.cells.length >= 2 && row.cells[1].textContent.trim().toLowerCase() === name && row.cells[0].textContent.replace("#", "").trim() !== currentId) {
                 duplicate = true;
             }
         });
@@ -337,11 +334,9 @@
 
         document.getElementById("materialTypeId").value = "";
 
-        document.getElementById("formTitle").textContent =
-            "Add material type";
+        document.getElementById("formTitle").textContent = "Add material type";
 
-        document.getElementById("submitBtn").textContent =
-            "Add material type";
+        document.getElementById("submitBtn").textContent = "Add material type";
 
         document.getElementById("nameError").style.display = "none";
     }
