@@ -41,13 +41,7 @@ public class MaterialQualityCheckController {
             return "redirect:/login";
         }
         try {
-            checkService.recordCheck(
-                    purchaseId,
-                    qualityGrade,
-                    result,
-                    remarks,
-                    userId
-            );
+            checkService.recordCheck(purchaseId, qualityGrade, result, remarks, userId);
             if ("Passed".equals(result)) {
                 redirectAttributes.addFlashAttribute(
                         "success", "Passed. Stock added.");
