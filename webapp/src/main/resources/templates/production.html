@@ -1,108 +1,182 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Production Pipeline</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 40px; color: #2c3e50; }
-        h1 { color: #000000; border-bottom: 3px solid #ac0606; padding-bottom: 10px; }
-        h2 { margin-top: 40px; color: #000000; }
-        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-top: 15px; }
-        th, td { padding: 12px 15px; text-align: center; }
-        th { background-color: #8b4545; color: white; }
-        tr:nth-child(even) { background-color: #f0f3f7; }
-        select { padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background-color: #ac0606; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #83060f; }
-        .stage-badge { padding: 4px 10px; border-radius: 12px; color: white; font-size: 13px; }
-        .RECEIVED { background-color: #7f8c8d; }
-        .PREPARATION { background-color: #e67e22; }
-        .BUILDING { background-color: #2980b9; }
-        .CURING { background-color: #8e44ad; }
-        .COMPLETED { background-color: #27ae60; }
-        form.add-form {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            max-width: 400px;
-            margin-top: 15px;
-        }
-        form.add-form label {
-            display: block;
-            margin-top: 12px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        form.add-form input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        form.add-form button {
-            margin-top: 20px;
-            width: 100%;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Pipeline | ASI Tyre</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/purchases.css}">
+    <link rel="stylesheet" th:href="@{/css/production.css}">
 </head>
 <body>
 
-<h1>Production Pipeline — Tyre Inventory</h1>
+<aside th:replace="~{fragments/sidebar :: sidebar('production')}"></aside>
 
-<table>
-    <tr>
-        <th>Tyre Batch Number</th><th>Order Number</th><th>Brand</th><th>Size</th><th>Client</th>
-        <th>Received</th><th>Expected</th><th>Stage</th><th>Update</th>
-    </tr>
-    <tr th:each="t : ${tyres}">
-        <td th:text="${t.tyreNumber}"></td>
-        <td th:text="${t.orderId}"></td>
-        <td th:text="${t.brand}"></td>
-        <td th:text="${t.tyreSize}"></td>
-        <td th:text="${userMap[t.customerId] != null ? userMap[t.customerId].firstName + ' ' + userMap[t.customerId].lastName : 'Unknown'}"></td>
-        <td th:text="${t.receivedDate}"></td>
-        <td th:text="${t.expectedDate}"></td>
-        <td>
-            <span class="stage-badge" th:classappend="${t.rebuildStage}" th:text="${t.rebuildStage}"></span>
-        </td>
-        <td>
-            <form th:action="@{/production/update-stage}" method="post" style="display:flex; gap:6px; justify-content:center;">
-                <input type="hidden" name="tyreId" th:value="${t.tyreId}"/>
-                <select name="stage">
-                    <option value="RECEIVED" th:selected="${t.rebuildStage.name() == 'RECEIVED'}">Received</option>
-                    <option value="PREPARATION" th:selected="${t.rebuildStage.name() == 'PREPARATION'}">Preparation</option>
-                    <option value="BUILDING" th:selected="${t.rebuildStage.name() == 'BUILDING'}">Building</option>
-                    <option value="CURING" th:selected="${t.rebuildStage.name() == 'CURING'}">Curing</option>
-                    <option value="COMPLETED" th:selected="${t.rebuildStage.name() == 'COMPLETED'}">Completed</option>
-                </select>
-                <button type="submit">Update</button>
-            </form>
-        </td>
-    </tr>
-</table>
+<main class="main">
 
-<h2>Add Tyre</h2>
-<form th:action="@{/production/add}" th:object="${newTyre}" method="post" class="add-form">
-    <label>Customer ID</label>
-    <input type="number" th:field="*{customerId}"/>
+    <div class="topbar">
+        <div class="page-title">
+            <h1>Production Pipeline</h1>
+            <p>Manage client orders and track tyres through the rebuild stages. Statuses can be changed at any time.</p>
+        </div>
+    </div>
 
-    <label>Order ID (optional)</label>
-    <input type="number" th:field="*{orderId}"/>
+    <p th:if="${success}" th:text="${success}" style="color:#047857; margin-bottom:15px;"></p>
+    <p th:if="${error}" th:text="${error}" style="color:#b91c1c; margin-bottom:15px;"></p>
 
-    <label>Tyre Number</label>
-    <input type="text" th:field="*{tyreNumber}"/>
+    <section class="table-container">
+        <div class="table-header"><h2>Add Tyre</h2></div>
+        <form th:action="@{/production/add}" th:object="${newTyre}" method="post" class="add-form">
+            <div><label>Customer ID</label><input type="number" th:field="*{customerId}" required/></div>
+            <div><label>Order ID (optional)</label><input type="number" th:field="*{orderId}"/></div>
+            <div><label>Tyre Number</label><input type="text" th:field="*{tyreNumber}" required/></div>
+            <div><label>Brand</label><input type="text" th:field="*{brand}"/></div>
+            <div><label>Size</label><input type="text" th:field="*{tyreSize}"/></div>
+            <div><button type="submit" class="next-btn">Add Tyre</button></div>
+        </form>
+    </section>
 
-    <label>Brand</label>
-    <input type="text" th:field="*{brand}"/>
+    <section class="table-container" style="margin-top:25px;">
+        <div class="table-header with-search">
+            <h2>Client Orders
+                <span class="count-pill" th:if="${pendingCount > 0}" th:text="${pendingCount} + ' pending'"></span>
+            </h2>
+            <input type="search" class="table-search" data-search-table="ordersTable"
+                   placeholder="Search orders (client, size, status...)">
+        </div>
+        <table id="ordersTable">
+            <thead>
+            <tr>
+                <th>Order</th><th>Client</th><th>Order Date</th><th>Required By</th>
+                <th>Tyre Size</th><th>Qty</th><th>Status</th><th>Change Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(orders)}">
+                <td colspan="8" class="empty">No client orders yet.</td>
+            </tr>
+            <tr th:each="o : ${orders}">
+                <td class="purchase-id" th:text="'#' + ${o.orderId}">#1</td>
+                <td th:text="${userMap[o.customerId] != null ? userMap[o.customerId].firstName + ' ' + userMap[o.customerId].lastName : 'Unknown'}"></td>
+                <td th:text="${o.orderDate}"></td>
+                <td th:text="${o.requiredDate != null ? o.requiredDate : '-'}"></td>
+                <td th:text="${o.tyreSize}"></td>
+                <td class="quantity" th:text="${o.quantity}"></td>
+                <td>
+                    <span class="badge" th:classappend="'st-' + ${o.orderStatus}"
+                          th:text="${o.orderStatus.name() == 'APPROVED' ? 'ACCEPTED'
+                                   : (o.orderStatus.name() == 'CANCELLED' ? 'DECLINED' : o.orderStatus)}"></span>
+                </td>
+                <td>
+                    <form th:action="@{/production/orders/status}" method="post" class="inline-form">
+                        <input type="hidden" name="orderId" th:value="${o.orderId}"/>
+                        <select name="status">
+                            <option value="PENDING"     th:selected="${o.orderStatus.name() == 'PENDING'}">Pending</option>
+                            <option value="APPROVED"    th:selected="${o.orderStatus.name() == 'APPROVED'}">Accepted</option>
+                            <option value="IN_PROGRESS" th:selected="${o.orderStatus.name() == 'IN_PROGRESS'}">In Progress</option>
+                            <option value="COMPLETED"   th:selected="${o.orderStatus.name() == 'COMPLETED'}">Completed</option>
+                            <option value="CANCELLED"   th:selected="${o.orderStatus.name() == 'CANCELLED'}">Declined</option>
+                        </select>
+                        <button type="submit" class="next-btn">Update</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
 
-    <label>Size</label>
-    <input type="text" th:field="*{tyreSize}"/>
+    <section class="table-container" style="margin-top:25px;">
+        <div class="table-header with-search">
+            <h2>Tyre Inventory</h2>
+            <input type="search" class="table-search" data-search-table="tyresTable"
+                   placeholder="Search tyres (batch number, brand, client...)">
+        </div>
+        <table id="tyresTable">
+            <thead>
+            <tr>
+                <th>Tyre Batch Number</th><th>Order</th><th>Brand</th><th>Size</th><th>Client</th>
+                <th>Received</th><th>Expected</th><th>Stage</th><th>Update</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(tyres)}">
+                <td colspan="9" class="empty">No tyres found.</td>
+            </tr>
+            <tr th:each="t : ${tyres}">
+                <td class="purchase-id" th:text="${t.tyreNumber}"></td>
+                <td th:text="${t.orderId != null ? '#' + t.orderId : '-'}"></td>
+                <td th:text="${t.brand}"></td>
+                <td th:text="${t.tyreSize}"></td>
+                <td th:text="${userMap[t.customerId] != null ? userMap[t.customerId].firstName + ' ' + userMap[t.customerId].lastName : 'Unknown'}"></td>
+                <td th:text="${t.receivedDate != null ? t.receivedDate : '-'}"></td>
+                <td th:text="${t.expectedDate != null ? t.expectedDate : '-'}"></td>
+                <td>
+                    <span class="badge" th:classappend="'stage-' + ${t.rebuildStage}" th:text="${t.rebuildStage}"></span>
+                </td>
+                <td>
+                    <form th:action="@{/production/update-stage}" method="post" class="inline-form">
+                        <input type="hidden" name="tyreId" th:value="${t.tyreId}"/>
+                        <select name="stage">
+                            <option value="RECEIVED"    th:selected="${t.rebuildStage.name() == 'RECEIVED'}">Received</option>
+                            <option value="PREPARATION" th:selected="${t.rebuildStage.name() == 'PREPARATION'}">Preparation</option>
+                            <option value="BUILDING"    th:selected="${t.rebuildStage.name() == 'BUILDING'}">Building</option>
+                            <option value="CURING"      th:selected="${t.rebuildStage.name() == 'CURING'}">Curing</option>
+                            <option value="COMPLETED"   th:selected="${t.rebuildStage.name() == 'COMPLETED'}">Completed</option>
+                        </select>
+                        <button type="submit" class="next-btn">Update</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
 
-    <button type="submit">Add Tyre</button>
-</form>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        document.querySelectorAll('input[data-search-table]').forEach(function (input) {
+            var table = document.getElementById(input.dataset.searchTable);
+            if (!table) return;
+
+            var tbody = table.querySelector('tbody');
+            var columnCount = table.querySelectorAll('thead th').length;
+
+            // Rows that hold real data (skip the "No ... found" placeholder row)
+            var rows = Array.from(tbody.querySelectorAll('tr')).filter(function (row) {
+                return !row.querySelector('td.empty');
+            });
+
+            // "No matching results" row, shown only when a search finds nothing
+            var noMatch = document.createElement('tr');
+            noMatch.style.display = 'none';
+            noMatch.innerHTML = '<td colspan="' + columnCount + '" class="empty">No matching results.</td>';
+            tbody.appendChild(noMatch);
+
+            function rowText(row) {
+                return Array.from(row.cells)
+                    .filter(function (cell) { return !cell.querySelector('select, form'); })
+                    .map(function (cell) { return cell.textContent; })
+                    .join(' ')
+                    .toLowerCase();
+            }
+
+            input.addEventListener('input', function () {
+                var query = input.value.trim().toLowerCase();
+                var visible = 0;
+
+                rows.forEach(function (row) {
+                    var match = query === '' || rowText(row).indexOf(query) !== -1;
+                    row.style.display = match ? '' : 'none';
+                    if (match) visible++;
+                });
+
+                noMatch.style.display = (visible === 0 && rows.length > 0) ? '' : 'none';
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

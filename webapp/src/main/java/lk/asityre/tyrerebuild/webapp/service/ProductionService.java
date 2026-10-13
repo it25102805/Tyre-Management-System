@@ -1,6 +1,8 @@
 package lk.asityre.tyrerebuild.webapp.service;
 
+import lk.asityre.tyrerebuild.webapp.model.Order;
 import lk.asityre.tyrerebuild.webapp.model.Tyre;
+import lk.asityre.tyrerebuild.webapp.repository.OrderRepository;
 import lk.asityre.tyrerebuild.webapp.repository.TyreRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +13,13 @@ import java.util.List;
 public class ProductionService {
 
     private final TyreRepository tyreRepository;
+    private final OrderRepository orderRepository;
 
-    public ProductionService(TyreRepository tyreRepository) {
+    public ProductionService(TyreRepository tyreRepository, OrderRepository orderRepository) {
         this.tyreRepository = tyreRepository;
+        this.orderRepository = orderRepository;
     }
+
 
     public List<Tyre> getAllTyres() {
         return tyreRepository.findAllByOrderByTyreIdDesc();
@@ -55,5 +60,19 @@ public class ProductionService {
         }
 
         tyreRepository.save(tyre);
+    }
+
+    public List<Order> getAllOrders() {
+        return orderRepository.findAllByOrderByOrderIdDesc();
+    }
+
+    public boolean updateOrderStatus(Integer orderId, Order.OrderStatus status) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) {
+            return false;
+        }
+        order.setOrderStatus(status);
+        orderRepository.save(order);
+        return true;
     }
 }

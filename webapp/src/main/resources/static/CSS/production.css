@@ -1,0 +1,94 @@
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.st-PENDING     { background: #e67e22; }
+.st-APPROVED    { background: #27ae60; }
+.st-IN_PROGRESS { background: #2980b9; }
+.st-COMPLETED   { background: #16a085; }
+.st-CANCELLED   { background: #7f8c8d; }
+
+.stage-RECEIVED    { background: #7f8c8d; }
+.stage-PREPARATION { background: #e67e22; }
+.stage-BUILDING    { background: #2980b9; }
+.stage-CURING      { background: #8e44ad; }
+.stage-COMPLETED   { background: #27ae60; }
+
+
+.count-pill {
+    display: inline-block;
+    background: #ac0606;
+    color: #fff;
+    font-size: 13px;
+    padding: 2px 12px;
+    border-radius: 12px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.inline-form {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.inline-form select {
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+
+.add-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    padding: 20px;
+    align-items: end;
+}
+
+.add-form label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.add-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+
+.table-header.with-search {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.table-search {
+    width: 100%;
+    max-width: 320px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.table-search:focus {
+    outline: none;
+    border-color: #ac0606;
+}

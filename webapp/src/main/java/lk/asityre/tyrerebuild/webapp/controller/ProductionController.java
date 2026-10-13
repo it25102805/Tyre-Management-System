@@ -1,12 +1,14 @@
 package lk.asityre.tyrerebuild.webapp.controller;
 
+import lk.asityre.tyrerebuild.webapp.model.Order;
 import lk.asityre.tyrerebuild.webapp.model.Tyre;
 import lk.asityre.tyrerebuild.webapp.model.User;
-import lk.asityre.tyrerebuild.webapp.service.ProductionService;
 import lk.asityre.tyrerebuild.webapp.repository.UserRepository;
+import lk.asityre.tyrerebuild.webapp.service.ProductionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +34,14 @@ public class ProductionController {
             userMap.put(u.getUserId(), u);
         }
 
+        List<Order> orders = productionService.getAllOrders();
+        long pendingCount = orders.stream()
+                .filter(o -> o.getOrderStatus() == Order.OrderStatus.PENDING)
+                .count();
+
         model.addAttribute("tyres", productionService.getAllTyres());
+        model.addAttribute("orders", orders);
+        model.addAttribute("pendingCount", pendingCount);
         model.addAttribute("userMap", userMap);
         model.addAttribute("newTyre", new Tyre());
         return "production";
@@ -47,12 +56,27 @@ public class ProductionController {
     @PostMapping("/update-stage")
     public String updateStage(@RequestParam Integer tyreId, @RequestParam String stage) {
         try {
-            // Safely parse the String to the Enum Type
             Tyre.RebuildStage enumStage = Tyre.RebuildStage.valueOf(stage.toUpperCase());
             productionService.updateStage(tyreId, enumStage);
         } catch (IllegalArgumentException e) {
-            // Failsafe in case a bad string is passed from the UI
             System.err.println("Invalid stage passed: " + stage);
+        }
+        return "redirect:/production";
+    }
+
+    @PostMapping("/orders/status")
+    public String updateOrderStatus(@RequestParam Integer orderId,
+                                    @RequestParam String status,
+                                    RedirectAttributes redirect) {
+        try {
+            Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
+            if (productionService.updateOrderStatus(orderId, newStatus)) {
+                redirect.addFlashAttribute("success", "Order #" + orderId + " updated to " + newStatus + ".");
+            } else {
+                redirect.addFlashAttribute("error", "Order #" + orderId + " was not found.");
+            }
+        } catch (IllegalArgumentException e) {
+            redirect.addFlashAttribute("error", "Invalid status: " + status);
         }
         return "redirect:/production";
     }

@@ -35,6 +35,14 @@
         📊 Inventory
     </a>
 
+    <div class="menu-title spaced">Production</div>
+
+    <a th:href="@{/production}"
+       class="menu-item"
+       th:classappend="${active == 'production'} ? 'active'">
+        🏭 Production Pipeline
+    </a>
+
     <div class="menu-title spaced">Client Support</div>
 
     <a th:href="@{/complaints}"
