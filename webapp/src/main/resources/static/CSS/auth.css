@@ -52,7 +52,7 @@ button:hover { background-color: #83060f; }
 .error   { color: #ac0606; }
 .success { color: #047857; }
 
-/* Two-column layout for the longer staff form */
+
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -60,7 +60,7 @@ button:hover { background-color: #83060f; }
 }
 .form-grid .full { grid-column: 1 / -1; }
 
-/* Customer / Staff chooser */
+
 .choice-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

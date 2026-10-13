@@ -5,8 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ProductionQualityCheckRepository
-        extends JpaRepository<ProductionQualityCheck, Integer> {
-
-    List<ProductionQualityCheck> findByTyreId(Integer tyreId);
+public interface ProductionQualityCheckRepository extends JpaRepository<ProductionQualityCheck, Integer> {
 }

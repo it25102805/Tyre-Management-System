@@ -30,27 +30,20 @@ public class ComplaintController {
         } else {
             model.addAttribute("complaints", complaintService.getComplaintsByCustomer(userId));
         }
-
         return "complaints";
     }
 
     @PostMapping("/submit")
-    public String submitComplaint(@RequestParam Integer orderId,
-                                  @RequestParam String description,
-                                  HttpSession session) {
+    public String submitComplaint(@RequestParam Integer orderId, @RequestParam String description, HttpSession session) {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/login";
         }
-
         complaintService.submitComplaint(orderId, userId, description);
         return "redirect:/complaints";
     }
-
     @PostMapping("/{id}/status")
-    public String updateStatus(@PathVariable Integer id,
-                               @RequestParam String status,
-                               HttpSession session) {
+    public String updateStatus(@PathVariable Integer id, @RequestParam String status, HttpSession session) {
         String role = (String) session.getAttribute("role");
         if ("ADMIN".equals(role) || "MANAGER".equals(role)) {
             complaintService.updateStatus(id, status);

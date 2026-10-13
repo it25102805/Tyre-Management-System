@@ -44,18 +44,11 @@ public class OrderController {
         if (!"CUSTOMER".equals(role)) {
             return "redirect:/orders";
         }
-        orderService.createOrder(
-                userId,
-                tyreSize,
-                quantity,
-                LocalDate.parse(requiredDate)
-        );
+        orderService.createOrder(userId, tyreSize, quantity, LocalDate.parse(requiredDate));
         return "redirect:/orders";
     }
     @PostMapping("/{id}/status")
-    public String updateStatus(@PathVariable Integer id,
-                               @RequestParam String status,
-                               HttpSession session) {
+    public String updateStatus(@PathVariable Integer id, @RequestParam String status, HttpSession session) {
         Integer userId = (Integer) session.getAttribute("userId");
         String role = (String) session.getAttribute("role");
         if (userId == null) {
@@ -65,8 +58,7 @@ public class OrderController {
             return "redirect:/orders";
         }
         try {
-            Order.OrderStatus orderStatus =
-                    Order.OrderStatus.valueOf(status.toUpperCase());
+            Order.OrderStatus orderStatus = Order.OrderStatus.valueOf(status.toUpperCase());
             orderService.updateOrderStatus(id, orderStatus);
         } catch (IllegalArgumentException e) {
             return "redirect:/orders";

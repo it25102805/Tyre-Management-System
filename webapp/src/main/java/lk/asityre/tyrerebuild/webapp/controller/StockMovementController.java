@@ -57,12 +57,8 @@ public class StockMovementController {
     }
 
     @PostMapping("/sourcing/stock-movements/save")
-    public String save(@ModelAttribute StockMovement movement,
-                       HttpSession session,
-                       RedirectAttributes ra) {
-
+    public String save(@ModelAttribute StockMovement movement, HttpSession session, RedirectAttributes ra) {
         Integer userId = (Integer) session.getAttribute("userId");
-
         if (userId == null) {
             return "redirect:/login";
         }

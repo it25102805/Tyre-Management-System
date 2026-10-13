@@ -32,7 +32,7 @@ public class AccessInterceptor implements HandlerInterceptor {
 
         String page = AccessPolicy.pageForPath(path);
         if (page == null) {
-            return true;   // e.g. /dashboard: any logged-in user
+            return true;
         }
 
         Set<String> pages = (Set<String>) session.getAttribute("pages");

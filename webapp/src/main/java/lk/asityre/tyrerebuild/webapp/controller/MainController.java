@@ -77,15 +77,12 @@ public class MainController {
         return "redirect:/login";
     }
 
-    // ---------- Register (one page with a Customer / Staff switch) ----------
-
     @GetMapping("/register")
     public String registerPage(@RequestParam(defaultValue = "customer") String tab, Model model) {
         model.addAttribute("tab", tab);
         return "register";
     }
 
-    // Old separate pages now point to the single page
     @GetMapping("/register/customer")
     public String registerCustomerRedirect() {
         return "redirect:/register";
@@ -97,11 +94,7 @@ public class MainController {
     }
 
     @PostMapping("/register/customer")
-    public String registerCustomer(@RequestParam String firstName, @RequestParam String lastName,
-                                   @RequestParam String email, @RequestParam String phone,
-                                   @RequestParam String password, @RequestParam String date,
-                                   @RequestParam String time, @RequestParam String purpose,
-                                   Model model, RedirectAttributes redirect) {
+    public String registerCustomer(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String email, @RequestParam String phone, @RequestParam String password, @RequestParam String date, @RequestParam String time, @RequestParam String purpose, Model model, RedirectAttributes redirect) {
         try {
             userService.registerCustomer(firstName.trim(), lastName.trim(), email.trim(),
                     phone.trim(), password, date, time, purpose.trim());
@@ -116,10 +109,7 @@ public class MainController {
     }
 
     @PostMapping("/register/staff")
-    public String registerStaff(@RequestParam String firstName, @RequestParam String lastName,
-                                @RequestParam String email, @RequestParam String phone,
-                                @RequestParam String password,
-                                Model model, RedirectAttributes redirect) {
+    public String registerStaff(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String email, @RequestParam String phone, @RequestParam String password, Model model, RedirectAttributes redirect) {
         try {
             userService.registerStaff(firstName.trim(), lastName.trim(), email.trim(), phone.trim(), password);
         } catch (IllegalArgumentException e) {
@@ -127,8 +117,7 @@ public class MainController {
             model.addAttribute("tab", "staff");
             return "register";
         }
-        redirect.addFlashAttribute("success",
-                "Application submitted. You can log in once the admin approves you.");
+        redirect.addFlashAttribute("success", "Application submitted. You can log in once the admin approves you.");
         return "redirect:/login";
     }
 

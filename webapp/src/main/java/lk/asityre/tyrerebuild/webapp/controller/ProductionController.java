@@ -65,9 +65,7 @@ public class ProductionController {
     }
 
     @PostMapping("/orders/status")
-    public String updateOrderStatus(@RequestParam Integer orderId,
-                                    @RequestParam String status,
-                                    RedirectAttributes redirect) {
+    public String updateOrderStatus(@RequestParam Integer orderId, @RequestParam String status, RedirectAttributes redirect) {
         try {
             Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
             if (productionService.updateOrderStatus(orderId, newStatus)) {

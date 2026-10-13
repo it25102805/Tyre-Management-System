@@ -78,8 +78,7 @@ public class AdminController {
         try {
             boolean approve = "approve".equals(decision);
             userService.decideStaff(userId, approve, position);
-            redirect.addFlashAttribute("success",
-                    "Staff member " + (approve ? "approved." : "rejected."));
+            redirect.addFlashAttribute("success", "Staff member " + (approve ? "approved." : "rejected."));
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
         }

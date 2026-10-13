@@ -15,8 +15,7 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, In
             "FROM StockMovement m " +
             "WHERE m.materialTypeId = :materialTypeId " +
             "AND m.movementType = :movementType")
-    int sumQuantity(@Param("materialTypeId") Integer materialTypeId,
-                    @Param("movementType") String movementType);
+    int sumQuantity(@Param("materialTypeId") Integer materialTypeId, @Param("movementType") String movementType);
 }
 
 

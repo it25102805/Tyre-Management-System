@@ -26,9 +26,7 @@
 }
 
 
-/* =========================================
-   MOVEMENT SEARCH + FILTER
-   ========================================= */
+/* MOVEMENT SEARCH + FILTER */
 
 .movement-tools {
     display: flex;
@@ -54,9 +52,7 @@
 }
 
 
-/* =========================================
-   RECORD MOVEMENT FORM
-   ========================================= */
+/* RECORD MOVEMENT FORM */
 
 .form-group input,
 .form-group select {
@@ -71,9 +67,7 @@
 }
 
 
-/* =========================================
-   RECORD MOVEMENT MODAL
-   ========================================= */
+/* RECORD MOVEMENT MODAL  */
 
 .modal {
     display: none;
@@ -132,9 +126,7 @@
 }
 
 
-/* =========================================
-   RESPONSIVE
-   ========================================= */
+/* RESPONSIVE */
 
 @media (max-width: 700px) {
 

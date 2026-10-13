@@ -76,7 +76,7 @@ public class MaterialPurchaseService {
 
         /*
 
-        latest edit here
+        latest edit changes
 
          */
         if (materialPurchase.getStatus() == null || materialPurchase.getStatus().isEmpty()) {
@@ -86,7 +86,6 @@ public class MaterialPurchaseService {
             materialPurchase.setPurchaseDate(LocalDate.now());
         }
 
-        // Find the staff member belonging to the logged-in user
         Optional<Staff> staffResult = staffRepository.findByUserId(userId);
 
         if (staffResult.isEmpty()) {
@@ -95,7 +94,6 @@ public class MaterialPurchaseService {
             );
         }
 
-        // Save staff id into handled_by
         Staff staff = staffResult.get();
         materialPurchase.setHandledBy(staff.getStaffId());
         return materialPurchaseRepository.save(materialPurchase);

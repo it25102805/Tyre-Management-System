@@ -1,7 +1,6 @@
 package lk.asityre.tyrerebuild.webapp.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "staff")
@@ -31,7 +30,11 @@ public class Staff {
     public void setUserId(Integer userId) {
         this.userId = userId; }
 
-    public String getRole() { return role; }
+    public String getRole() {
+        return role;
+    }
+
     public void setRole(String role) {
-        this.role = role; }
+        this.role = role;
+    }
 }

@@ -67,7 +67,7 @@ img {
     color: var(--muted);
 }
 
-/* ---------- Buttons ---------- */
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -107,7 +107,7 @@ a:focus-visible,
     outline-offset: 2px;
 }
 
-/* ---------- Brand (logo + name) ---------- */
+
 .brand {
     display: flex;
     align-items: center;
@@ -139,7 +139,7 @@ a:focus-visible,
     text-transform: uppercase;
 }
 
-/* ---------- Navbar ---------- */
+
 .navbar {
     position: sticky;
     top: 0;
@@ -179,7 +179,7 @@ a:focus-visible,
     background: var(--primary-hover);
 }
 
-/* ---------- Hero ---------- */
+
 .hero {
     min-height: 460px;
     display: flex;
@@ -218,7 +218,7 @@ a:focus-visible,
     gap: 12px;
 }
 
-/* ---------- About ---------- */
+
 .about-grid {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
@@ -226,7 +226,7 @@ a:focus-visible,
     gap: 50px;
 }
 
-/* Big picture in the About section (replaces the old .about-logo box) */
+
 .about-photo {
     min-height: 320px;
     overflow: hidden;
@@ -272,7 +272,7 @@ a:focus-visible,
     font-weight: 800;
 }
 
-/* ---------- Services ---------- */
+
 .services {
     background: var(--light);
     border-top: 1px solid var(--border);
@@ -314,7 +314,7 @@ a:focus-visible,
     font-size: 13px;
 }
 
-/* ---------- Process ---------- */
+
 .process-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -351,7 +351,7 @@ a:focus-visible,
     font-size: 13px;
 }
 
-/* ---------- Contact ---------- */
+
 .contact {
     background: var(--light);
     border-top: 1px solid var(--border);
@@ -395,7 +395,7 @@ a:focus-visible,
     font-size: 13px;
 }
 
-/* ---------- Footer ---------- */
+
 .footer {
     padding: 30px 0;
     background: var(--dark);
@@ -429,7 +429,6 @@ a:focus-visible,
     color: #b5bac3;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 800px) {
     .about-grid,
     .contact-grid {

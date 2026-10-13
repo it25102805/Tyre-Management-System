@@ -9,7 +9,5 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Integer> {
 
     List<Complaint> findByCustomerIdOrderByComplaintDateDesc(Integer customerId);
 
-    List<Complaint> findByStatusOrderByComplaintDateDesc(String status);
-
     List<Complaint> findAllByOrderByComplaintDateDesc();
 }

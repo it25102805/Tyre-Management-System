@@ -25,7 +25,7 @@ public class MaterialTypeController {
     private MaterialPurchaseService materialPurchaseService;
 
 
-    // Display the material types page
+    // Displaying material types page
     @GetMapping("/sourcing/material-types")
     public String viewMaterialTypes(Model model) {
         List<MaterialType> materialTypes = materialTypeService.getAllMaterialTypes();
@@ -49,24 +49,23 @@ public class MaterialTypeController {
         return "material-types";
     }
 
-
-    // Add a new material type or update an existing one
+    // Add new material type or update an existing one
     @PostMapping("/sourcing/material-types")
     public String saveMaterialType(
             @ModelAttribute("newMaterialType") MaterialType materialType) {
         Integer materialTypeId = materialType.getMaterialTypeId();
         if (materialTypeId == null) {
-            // Add a new material type
+            // Add new material type
             materialTypeService.saveMaterialType(materialType);
         } else {
-            // Update an existing material type
+            // Update existing material type
             materialTypeService.updateMaterialType(materialTypeId, materialType);
         }
         return "redirect:/sourcing/material-types";
     }
 
 
-    // Delete a material type
+    // Delete material type
     @PostMapping("/sourcing/material-types/delete/{id}")
     public String deleteMaterialType(@PathVariable Integer id) {
         boolean isUsed = materialPurchaseService.isMaterialTypeUsed(id);

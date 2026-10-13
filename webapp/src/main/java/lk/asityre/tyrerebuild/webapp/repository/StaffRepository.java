@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StaffRepository extends JpaRepository<Staff, Integer> {
-
     Optional<Staff> findByUserId(Integer userId);
-
     List<Staff> findAllByOrderByStaffIdDesc();
 }
