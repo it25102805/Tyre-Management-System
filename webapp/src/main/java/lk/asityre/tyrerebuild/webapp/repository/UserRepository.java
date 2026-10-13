@@ -7,13 +7,9 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    // UPDATE: Only allow login if the user is APPROVED and ACTIVE
-    Optional<User> findByEmailAndPasswordAndApprovalStatusAndStatus(
-            String email,
-            String password,
-            String approvalStatus,
-            String status
-    );
+    Optional<User> findByEmailAndPasswordAndApprovalStatusAndStatus(String email, String password, String approvalStatus, String status);
+
+    Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
 }

@@ -21,12 +21,12 @@ public class MainController {
         this.appointmentService = appointmentService;
     }
 
-    @GetMapping("/")
+    // This update is perfectly fine, assuming you have a Home.html template!
+    @GetMapping({"/", "/home", "/Home"})
     public String home() {
-        return "redirect:/login";
+        return "Home";
     }
 
-    // ---------- Login ----------
     @GetMapping("/login")
     public String loginPage() {
         return "login";
@@ -54,7 +54,6 @@ public class MainController {
         return "redirect:/login";
     }
 
-    // ---------- Register (visitor books a meeting) ----------
     @GetMapping("/register")
     public String registerPage() {
         return "register";
@@ -66,12 +65,12 @@ public class MainController {
                            @RequestParam String time, @RequestParam String purpose,
                            Model model) {
         try {
-            // Split the single "name" string into firstName and lastName
+            // FIX: Split the single name string into firstName and lastName
             String[] nameParts = name.trim().split("\\s+", 2);
             String firstName = nameParts[0];
             String lastName = nameParts.length > 1 ? nameParts[1] : "";
 
-            // Pass the split names to the UserService
+            // Pass 7 arguments to match the updated UserService signature
             userService.registerVisitor(firstName, lastName, email, password, date, time, purpose);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
@@ -80,7 +79,6 @@ public class MainController {
         return "redirect:/login";
     }
 
-    // ---------- Dashboard ----------
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
         String role = (String) session.getAttribute("role");
@@ -102,7 +100,6 @@ public class MainController {
         return "dashboard";
     }
 
-    // Employees and admins can change an appointment status
     @PostMapping("/status")
     public String updateStatus(@RequestParam Integer id, @RequestParam String status, HttpSession session) {
         String role = (String) session.getAttribute("role");

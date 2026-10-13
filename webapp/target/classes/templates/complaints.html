@@ -91,10 +91,11 @@
 
                 <td style="text-align: left; max-width: 300px;" th:text="${c.description}">Description text</td>
 
+                <!-- STATUS BADGE: Changed OPEN to PENDING for display only -->
                 <td>
                     <span class="status"
                           th:classappend="${c.status == 'OPEN' ? 'open' : (c.status == 'IN_REVIEW' ? 'in_review' : 'resolved')}"
-                          th:text="${#strings.replace(c.status, '_', ' ')}">
+                          th:text="${c.status == 'OPEN' ? 'PENDING' : #strings.replace(c.status, '_', ' ')}">
                     </span>
                 </td>
 
@@ -102,7 +103,8 @@
                 <td th:if="${session.role == 'MANAGER' or session.role == 'ADMIN'}">
                     <form th:action="@{/complaints/{id}/status(id=${c.complaintId})}" method="post" style="display:flex; gap:6px; justify-content:center;">
                         <select name="status" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
-                            <option value="OPEN" th:selected="${c.status == 'OPEN'}">OPEN</option>
+                            <!-- Display as PENDING, but submit value as OPEN -->
+                            <option value="OPEN" th:selected="${c.status == 'OPEN'}">PENDING</option>
                             <option value="IN_REVIEW" th:selected="${c.status == 'IN_REVIEW'}">IN REVIEW</option>
                             <option value="RESOLVED" th:selected="${c.status == 'RESOLVED'}">RESOLVED</option>
                         </select>

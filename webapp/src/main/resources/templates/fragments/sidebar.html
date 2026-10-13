@@ -37,6 +37,12 @@
 
     <div class="menu-title spaced">Client Support</div>
 
+    <a th:href="@{/orders}"
+       class="menu-item"
+       th:classappend="${active == 'orders'} ? 'active'">
+        📋 Orders
+    </a>
+
     <a th:href="@{/complaints}"
        class="menu-item"
        th:classappend="${active == 'complaints'} ? 'active'">

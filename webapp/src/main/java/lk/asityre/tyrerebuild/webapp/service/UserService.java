@@ -58,4 +58,22 @@ public class UserService {
         }
         return map;
     }
+
+    // ---------- Forgot password ----------
+
+    /** Used by the forgot-password page to check the email is registered. */
+    public boolean emailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    /** Saves a new password for the user with this email. */
+    @Transactional
+    public void updatePassword(String email, String newPassword) {
+        // NOTE: This requires you to add findByEmail(String email) to your UserRepository
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+        user.setPassword(newPassword);
+        userRepository.save(user);
+    }
 }

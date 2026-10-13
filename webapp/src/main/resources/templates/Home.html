@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASI Tyre | Tyre Rebuild Management System</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+    <div class="container nav-inner">
+        <a th:href="@{/}" class="logo">ASI <span>Tyre</span></a>
+
+        <nav class="nav-links">
+            <a href="#services">Services</a>
+            <a href="#process">How It Works</a>
+            <a href="#why-us">Why Us</a>
+            <a href="#contact">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a th:href="@{/login}" class="btn btn-outline">Login</a>
+            <a th:href="@{/register}" class="btn btn-primary">Register</a>
+        </div>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="container hero-inner">
+
+        <div class="hero-text">
+            <span class="badge">Tyre Rebuild Management System</span>
+            <h1>Give Your Tyres a <span>Second Life</span></h1>
+            <p>
+                Book a meeting, follow every stage of your tyre rebuild and stay
+                updated until your tyres are ready, all in one place.
+            </p>
+            <div class="hero-buttons">
+                <a th:href="@{/register}" class="btn btn-primary btn-lg">Book a Meeting</a>
+                <a th:href="@{/login}" class="btn btn-outline btn-lg">Login</a>
+            </div>
+        </div>
+
+        <div class="hero-card">
+            <h3>Rebuild Progress</h3>
+            <ul class="status-list">
+                <li><span class="dot done"></span> Inspection <em class="status received">Completed</em></li>
+                <li><span class="dot done"></span> Buffing <em class="status received">Completed</em></li>
+                <li><span class="dot active"></span> Retreading <em class="status ordered">In Progress</em></li>
+                <li><span class="dot"></span> Curing <em class="status pending">Pending</em></li>
+                <li><span class="dot"></span> Quality Check <em class="status pending">Pending</em></li>
+            </ul>
+        </div>
+
+    </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+    <div class="container cards">
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Rebuild Tracking</div>
+                <div class="card-icon">🛞</div>
+            </div>
+            <div class="card-text">Live status for every order</div>
+        </div>
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Material Sourcing</div>
+                <div class="card-icon">📦</div>
+            </div>
+            <div class="card-text">Purchases managed by our team</div>
+        </div>
+        <div class="card">
+            <div class="card-top">
+                <div class="card-title">Appointments</div>
+                <div class="card-icon">📅</div>
+            </div>
+            <div class="card-text">Easy online meeting booking</div>
+        </div>
+    </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="section">
+    <div class="container">
+        <h2 class="section-title">Our Services</h2>
+        <p class="section-sub">Complete tyre rebuilding handled and tracked end to end.</p>
+
+        <div class="grid grid-3">
+            <div class="panel">
+                <div class="icon">🔍</div>
+                <h3>Casing Inspection</h3>
+                <p>Every tyre is inspected to confirm it is suitable for rebuilding.</p>
+            </div>
+            <div class="panel">
+                <div class="icon">🛞</div>
+                <h3>Retreading</h3>
+                <p>Fresh tread is bonded to your sound casing at a fraction of the cost of a new tyre.</p>
+            </div>
+            <div class="panel">
+                <div class="icon">✓</div>
+                <h3>Quality Testing</h3>
+                <p>Final checks make sure each rebuilt tyre meets safety standards.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="section section-alt">
+    <div class="container">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-sub">Four simple steps from booking to collection.</p>
+
+        <div class="grid grid-4">
+            <div class="step"><span>1</span><h4>Register</h4><p>Create your account and book a meeting.</p></div>
+            <div class="step"><span>2</span><h4>Meet Our Team</h4><p>Discuss your tyres and requirements.</p></div>
+            <div class="step"><span>3</span><h4>Track Progress</h4><p>Follow each rebuild stage online.</p></div>
+            <div class="step"><span>4</span><h4>Collect</h4><p>Pick up your rebuilt tyres.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- WHY US -->
+<section id="why-us" class="section">
+    <div class="container">
+        <h2 class="section-title">Why Choose Us</h2>
+        <p class="section-sub">Quality rebuilds you can follow from start to finish.</p>
+
+        <div class="grid grid-3">
+            <div class="panel"><h3>Save Money</h3><p>Rebuilt tyres cost much less than new ones.</p></div>
+            <div class="panel"><h3>Eco Friendly</h3><p>Reusing casings reduces rubber waste.</p></div>
+            <div class="panel"><h3>Full Transparency</h3><p>Know exactly where your order is at all times.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+    <div class="container">
+        <h2>Ready to get started?</h2>
+        <p>Create an account and book your first meeting today.</p>
+        <a th:href="@{/register}" class="btn btn-light btn-lg">Register Now</a>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact" class="footer">
+    <div class="container footer-inner">
+        <div>
+            <div class="logo">ASI <span>Tyre</span></div>
+            <p>Tyre Rebuild Management System</p>
+        </div>
+        <div>
+            <h4>Contact</h4>
+            <p>Email: info@asityre.example</p>
+            <p>Phone: +94 00 000 0000</p>
+        </div>
+    </div>
+    <div class="copy">&copy; 2026 ASI Tyre. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
