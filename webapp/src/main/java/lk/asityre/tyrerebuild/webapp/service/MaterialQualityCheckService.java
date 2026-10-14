@@ -1,12 +1,20 @@
 package lk.asityre.tyrerebuild.webapp.service;
 
-import lk.asityre.tyrerebuild.webapp.model.*;
-import lk.asityre.tyrerebuild.webapp.repository.*;
+import lk.asityre.tyrerebuild.webapp.model.MaterialPurchase;
+import lk.asityre.tyrerebuild.webapp.model.MaterialQualityCheck;
+import lk.asityre.tyrerebuild.webapp.model.Staff;
+import lk.asityre.tyrerebuild.webapp.model.StockMovement;
+import lk.asityre.tyrerebuild.webapp.repository.MaterialPurchaseRepository;
+import lk.asityre.tyrerebuild.webapp.repository.MaterialQualityCheckRepository;
+import lk.asityre.tyrerebuild.webapp.repository.StaffRepository;
+import lk.asityre.tyrerebuild.webapp.repository.StockMovementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MaterialQualityCheckService {
@@ -35,21 +43,21 @@ public class MaterialQualityCheckService {
             throw new IllegalArgumentException("Result must be Passed or Failed.");
         }
 
-        MaterialPurchase p = purchaseRepository.findById(purchaseId).orElse(null);
-
-        if (p == null) {
+        Optional<MaterialPurchase> purchaseResult = purchaseRepository.findById(purchaseId);
+        if (purchaseResult.isEmpty()) {
             throw new IllegalArgumentException("Purchase not found.");
         }
+        MaterialPurchase p = purchaseResult.get();
 
         if (!"Pending".equals(p.getStatus())) {
             throw new IllegalArgumentException("Only arrived (Pending) purchases can be checked.");
         }
 
-        Staff staff = staffRepository.findByUserId(userId).orElse(null);
-
-        if (staff == null) {
+        Optional<Staff> staffResult = staffRepository.findByUserId(userId);
+        if (staffResult.isEmpty()) {
             throw new IllegalArgumentException("The logged in user is not registered as a staff member.");
         }
+        Staff staff = staffResult.get();
 
         MaterialQualityCheck c = new MaterialQualityCheck();
         c.setPurchaseId(purchaseId);

@@ -27,14 +27,6 @@ public class MaterialPurchaseService {
         return materialPurchaseRepository.findByStatusOrderByPurchaseIdDesc(status);
     }
 
-    public MaterialPurchase getMaterialPurchaseById(Integer id) {
-        Optional<MaterialPurchase> result = materialPurchaseRepository.findById(id);
-        if (result.isPresent()) {
-            return result.get();
-        }
-        return null;
-    }
-
     public MaterialPurchase updatePurchaseStatus(Integer id, String newStatus) {
         Optional<MaterialPurchase> result = materialPurchaseRepository.findById(id);
         if (result.isEmpty()) return null;
@@ -42,31 +34,10 @@ public class MaterialPurchaseService {
         MaterialPurchase p = result.get();
         boolean validStep = "Ordered".equals(p.getStatus()) && "Pending".equals(newStatus);
         if (!validStep) {
-            throw new IllegalArgumentException(
-                    "Cannot change status from " + p.getStatus() + " to " + newStatus);
+            throw new IllegalArgumentException("Cannot change status from " + p.getStatus() + " to " + newStatus);
         }
         p.setStatus(newStatus);
         return materialPurchaseRepository.save(p);
-    }
-
-    public MaterialPurchase updatePurchase(Integer id, MaterialPurchase updatedDetails) {
-        Optional<MaterialPurchase> result = materialPurchaseRepository.findById(id);
-        if (result.isPresent()) {
-            MaterialPurchase existingPurchase = result.get();
-
-            if ("Received".equals(existingPurchase.getStatus())) {
-                throw new IllegalArgumentException("A Received purchase cannot be edited");
-            }
-            if (updatedDetails.getQuantity() == null || updatedDetails.getQuantity() <= 0) {
-                throw new IllegalArgumentException("Quantity must be greater than zero");
-            }
-
-            existingPurchase.setQuantity(updatedDetails.getQuantity());
-            existingPurchase.setHandledBy(updatedDetails.getHandledBy());
-            return materialPurchaseRepository.save(existingPurchase);
-        } else {
-            return null;
-        }
     }
 
     public MaterialPurchase saveMaterialPurchase(MaterialPurchase materialPurchase,Integer userId) {
@@ -87,10 +58,8 @@ public class MaterialPurchaseService {
         }
 
         Optional<Staff> staffResult = staffRepository.findByUserId(userId);
-
         if (staffResult.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "The logged in user is not registered as a staff member."
+            throw new IllegalArgumentException("The logged in user is not registered as a staff member."
             );
         }
 

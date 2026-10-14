@@ -24,15 +24,12 @@ public class MaterialTypeController {
     @Autowired
     private MaterialPurchaseService materialPurchaseService;
 
-
-    // Displaying material types page
     @GetMapping("/sourcing/material-types")
     public String viewMaterialTypes(Model model) {
         List<MaterialType> materialTypes = materialTypeService.getAllMaterialTypes();
         model.addAttribute("materialTypes", materialTypes);
 
 
-        // Find material types already used in purchases
         List<Integer> usedMaterialTypeIds = new ArrayList<>();
         for (MaterialType type : materialTypes) {
             Integer materialTypeId = type.getMaterialTypeId();
@@ -42,37 +39,27 @@ public class MaterialTypeController {
         }
 
         model.addAttribute("usedMaterialTypeIds", usedMaterialTypeIds);
-
-
-        // Prepare an object for the add-material form
         model.addAttribute("newMaterialType", new MaterialType());
         return "material-types";
     }
 
-    // Add new material type or update an existing one
     @PostMapping("/sourcing/material-types")
-    public String saveMaterialType(
-            @ModelAttribute("newMaterialType") MaterialType materialType) {
+    public String saveMaterialType(@ModelAttribute("newMaterialType") MaterialType materialType) {
         Integer materialTypeId = materialType.getMaterialTypeId();
         if (materialTypeId == null) {
-            // Add new material type
             materialTypeService.saveMaterialType(materialType);
         } else {
-            // Update existing material type
             materialTypeService.updateMaterialType(materialTypeId, materialType);
         }
         return "redirect:/sourcing/material-types";
     }
 
-
-    // Delete material type
     @PostMapping("/sourcing/material-types/delete/{id}")
     public String deleteMaterialType(@PathVariable Integer id) {
         boolean isUsed = materialPurchaseService.isMaterialTypeUsed(id);
-        if (isUsed) {
-            return "redirect:/sourcing/material-types";
+        if (!isUsed) {
+            materialTypeService.deleteMaterialType(id);
         }
-        materialTypeService.deleteMaterialType(id);
         return "redirect:/sourcing/material-types";
     }
 }

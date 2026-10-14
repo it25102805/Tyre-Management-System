@@ -18,7 +18,6 @@ public class MaterialQualityCheckController {
     @Autowired
     private MaterialTypeService materialTypeService;
 
-    // Display the quality checks page
     @GetMapping("/sourcing/quality-checks")
     public String qualityChecksPage(Model model) {
         model.addAttribute("awaiting", checkService.getAwaitingCheck());
@@ -27,7 +26,7 @@ public class MaterialQualityCheckController {
                 materialTypeService.getAllMaterialTypes());
         return "quality-checks";
     }
-    // Save a quality check
+
     @PostMapping("/sourcing/quality-checks/save")
     public String saveQualityCheck(
             @RequestParam Integer purchaseId,

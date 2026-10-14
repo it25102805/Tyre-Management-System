@@ -29,7 +29,6 @@ public class MainController {
         return "home";
     }
 
-    // ---------- Login ----------
     @GetMapping("/login")
     public String loginPage() {
         return "login";
@@ -121,7 +120,6 @@ public class MainController {
         return "redirect:/login";
     }
 
-    // ---------- Dashboard ----------
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
         String role = (String) session.getAttribute("role");
@@ -145,7 +143,6 @@ public class MainController {
         return "dashboard";
     }
 
-    // Staff (not customers) can change an appointment status
     @PostMapping("/status")
     public String updateStatus(@RequestParam Integer id, @RequestParam String status, HttpSession session) {
         String role = (String) session.getAttribute("role");

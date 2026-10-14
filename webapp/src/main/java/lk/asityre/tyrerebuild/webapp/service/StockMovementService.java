@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StockMovementService {
@@ -24,7 +25,6 @@ public class StockMovementService {
         return movementRepository.findAllByOrderByMovementIdDesc();
     }
 
-    //Checking Usable stock
     public int getUsableStock(Integer typeId) {
         return movementRepository.sumQuantity(typeId, "RECEIVED_FROM_PURCHASE")
                 - movementRepository.sumQuantity(typeId, "ISSUED_TO_PRODUCTION");
@@ -32,6 +32,7 @@ public class StockMovementService {
 
     @Transactional
     public StockMovement record(StockMovement m, Integer userId) {
+
         if (m.getMaterialTypeId() == null) {
             throw new IllegalArgumentException("Select a material type.");
         }
@@ -45,10 +46,11 @@ public class StockMovementService {
             throw new IllegalArgumentException("Not enough usable stock.");
         }
 
-        Staff staff = staffRepository.findByUserId(userId).orElse(null);
-        if (staff == null) {
-            throw new IllegalArgumentException("The logged-in user is not registered as a staff member.");
+        Optional<Staff> staffResult = staffRepository.findByUserId(userId);
+        if (staffResult.isEmpty()) {
+            throw new IllegalArgumentException("The logged in user is not registered as a staff member.");
         }
+        Staff staff = staffResult.get();
 
         m.setHandledBy(staff.getStaffId());
         m.setMovementDate(LocalDate.now());

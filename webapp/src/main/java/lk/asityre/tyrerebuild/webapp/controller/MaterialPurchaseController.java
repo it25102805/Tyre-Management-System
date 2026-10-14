@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class MaterialPurchaseController {
@@ -19,7 +20,6 @@ public class MaterialPurchaseController {
     @Autowired
     private MaterialTypeService materialTypeService;
 
-    // Display the purchases page
     @GetMapping("/sourcing/purchases")
     public String purchasesPage(Model model) {
         model.addAttribute("purchases",
@@ -29,26 +29,27 @@ public class MaterialPurchaseController {
         return "purchases";
     }
 
-    // Save a new purchase
     @PostMapping("/sourcing/purchases/save")
-    public String savePurchase(
-            @ModelAttribute MaterialPurchase materialPurchase,
-            HttpSession session) {
+    public String savePurchase(@ModelAttribute MaterialPurchase materialPurchase, HttpSession session, RedirectAttributes redirectAttributes) {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/login";
         }
-        materialPurchaseService.saveMaterialPurchase(
-                materialPurchase, userId);
+        try {
+            materialPurchaseService.saveMaterialPurchase(materialPurchase, userId);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
         return "redirect:/sourcing/purchases";
     }
 
-    // Change the purchase status
     @PostMapping("/sourcing/purchases/{id}/status")
-    public String changeStatus(
-            @PathVariable Integer id,
-            @RequestParam String status) {
-        materialPurchaseService.updatePurchaseStatus(id, status);
+    public String changeStatus(@PathVariable Integer id, @RequestParam String status, RedirectAttributes redirectAttributes) {
+        try {
+            materialPurchaseService.updatePurchaseStatus(id, status);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
         return "redirect:/sourcing/purchases";
     }
 }

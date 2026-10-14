@@ -28,10 +28,8 @@ public class StockMovementController {
 
         List<MaterialType> types = materialTypeService.getAllMaterialTypes();
         List<StockLevel> levels = new ArrayList<>();
-
         for (MaterialType type : types) {
             int usable = stockMovementService.getUsableStock(type.getMaterialTypeId());
-
             int reorder = 0;
             if (type.getReorderLevel() != null) {
                 reorder = type.getReorderLevel();
@@ -52,7 +50,6 @@ public class StockMovementController {
         model.addAttribute("lowCount", lowCount);
         model.addAttribute("movements", stockMovementService.getAll());
         model.addAttribute("materialTypes", types);
-
         return "stock-movements";
     }
 
@@ -62,17 +59,14 @@ public class StockMovementController {
         if (userId == null) {
             return "redirect:/login";
         }
-
         try {
             stockMovementService.record(movement, userId);
             ra.addFlashAttribute("success", "Movement recorded.");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("error", e.getMessage());
         }
-
         return "redirect:/sourcing/stock-movements";
     }
-
     public record StockLevel(Integer materialTypeId, String name, String unit, int usable, int reorderLevel, boolean low) {
     }
 }
